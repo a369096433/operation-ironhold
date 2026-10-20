@@ -16,8 +16,11 @@
 一个完整的第一人称射击游戏，跑在浏览器标签页里。只有一个 HTML 文件，
 没有构建步骤，不需要包管理器，磁盘上也没有任何图片、音频或模型文件。
 
-**[在线试玩（中文版）](https://ironhold-zh.app.workbuddy.host/?sharecode=UDGPWQZB3V)**
+**[在线试玩（中文版）](https://a369096433.github.io/operation-ironhold/)**
 　|　[在线试玩（原版，英文）](https://starknightt.github.io/operation-ironhold/)
+
+中文版托管在 GitHub Pages 上，发布由 `tools/deploy-pages.mjs` 推到 `gh-pages` 分支完成，
+详见下文[部署](#部署)。
 
 ![游戏画面](screenshots/gameplay.jpg)
 
@@ -49,6 +52,61 @@ python -m http.server 8123
 游戏无法捕获鼠标。按 `Esc` 释放指针并暂停，再点击遮罩继续。
 
 需要支持 WebGL 与 Pointer Lock 的桌面浏览器。没有触屏输入，所以手机上玩不了。
+
+## 部署
+
+正式站点：<https://a369096433.github.io/operation-ironhold/>
+
+托管在 **GitHub Pages**，用 Pages 原生的「从分支发布」方式：`gh-pages` 分支的根目录
+就是站点根，源分支设为 `gh-pages`、路径 `/`。发布只需要一条命令：
+
+```bash
+node tools/deploy-pages.mjs              # 组装 .pages-dist/ 并发布到 gh-pages
+node tools/deploy-pages.mjs --dry-run    # 只组装并打印将发布的内容，不推送
+```
+
+链路是这样的：
+
+```
+tools/build-pages.mjs   挑出 index.html、og.jpg、screenshots/ → .pages-dist/
+tools/deploy-pages.mjs  用 git 底层命令把产物写成一棵 tree、造一个无父提交的 commit
+                        → 更新 refs/heads/gh-pages → 强推
+```
+
+**为什么不用 GitHub Actions**：向 `.github/workflows/` 推文件要求 token 带
+`workflow` 权限，而本地凭据通常只有 `repo` 权限，推 workflow 会被直接拒绝；
+分支发布只用得上 `repo` 权限，一次推送就完成，也不占 Actions 额度。
+代价是发布要在本地跑一次命令，而不是推 `main` 自动完成——对单文件静态站点来说，
+这点手工成本换掉了 CI 的一整条依赖链，是划算的。
+
+**为什么不直接发布仓库根目录**：仓库根同时也是站点根（`index.html` 在根上），
+但仓库里还有 README、PROMPTS 与 `tools/`，这些是开发文件，不该出现在线上站点。
+所以发布不以仓库根为源，而是由 `build-pages.mjs` 挑出站点需要的文件复制到
+`.pages-dist/`。脚本只用 Node 内置模块，不需要 `npm install`。
+
+`.pages-dist/` 已写进 `.gitignore`；产物里另有一个 `.nojekyll`，
+让 Pages 跳过 Jekyll 处理，纯静态站点不需要那一步。想以线上完全相同的文件本地预览：
+
+```bash
+node tools/build-pages.mjs
+python -m http.server 8123 -d .pages-dist
+```
+
+**发布脚本不碰工作区**：它不切分支，而是用 `git hash-object` / `mktree` /
+`commit-tree` 生成提交后直接改 `refs/heads/gh-pages` 再强推。所以发布失败时
+仓库不会停在半路，主分支的工作副本也不会被打扰。`gh-pages` 每次都是单提交、
+无父提交，历史不会越滚越长；提交信息里记录了源提交与构建时间，便于回溯。
+
+**首次在新仓库启用**（本仓库已完成）：Settings → Pages → Source 选
+`Deploy from a branch`，分支 `gh-pages`、目录 `/`，保存。分支不存在时先跑一次
+`node tools/deploy-pages.mjs`。
+
+**回退**：`gh-pages` 的每次发布都是一个独立提交。`git log origin/gh-pages` 找到
+上一次的提交，`git push origin <sha>:gh-pages --force` 即可回到那一版；
+源文件本身在 `main` 上，随时可以重新发布。
+
+本站早期曾临时托管在 WorkBuddy 的站点服务上（需要 `?sharecode=` 参数才能访问），
+该配置已整体移除，仓库与文档中不再保留任何相关链接、目录或应用记录。
 
 ## 操作
 
@@ -278,17 +336,20 @@ python -m http.server 8123
 ## 仓库结构
 
 ```
-index.html              整个游戏
-PROMPTS.md              指定它的提示词（中文译文）
-screenshots/            本 README 使用的图片
-tools/test-harness.js   碰撞、武器与 AI 测试套件
-tools/autoplay-bot.js   用于无人值守回归的寻路机器人
+index.html                       整个游戏
+PROMPTS.md                       指定它的提示词（中文译文）
+screenshots/                     本 README 与 og:image 使用的图片
+tools/test-harness.js            碰撞、武器与 AI 测试套件
+tools/autoplay-bot.js            用于无人值守回归的寻路机器人
+tools/build-pages.mjs            组装 GitHub Pages 发布目录
+tools/deploy-pages.mjs           把发布目录推到 gh-pages 分支
 ```
 
-`tools/` 里的两个文件仅供开发使用，`index.html` 都不引用它们；
-它们被粘贴进控制台，或通过 DevTools 协议注入。测试装置提供碰撞审计、
+`tools/` 里的脚本仅供开发与部署使用，`index.html` 都不引用它们；
+测试装置与机器人被粘贴进控制台，或通过 DevTools 协议注入。测试装置提供碰撞审计、
 武器精度与命中保真测试、地图边界探测以及敌人看门狗。
 机器人能自行打完整回合，可配置瞄准误差与反应延迟，碰撞与 AI 的修复正是这样回归验证的。
+后两个脚本是发布链路，见[部署](#部署)。
 
 ## 许可
 
@@ -340,15 +401,17 @@ MIT，见 [LICENSE](LICENSE)。
 
 ### 待确认项
 
-1. ~~`canonical`、`og:url`、`og:image` 仍指向上游 Pages 地址~~ —— **已处理**：已改为当前线上地址
-   `https://ironhold-zh.app.workbuddy.host/`。若日后更换部署域名，需同步替换 `index.html` 头部
-   这 5 处（第 10、14、17、18、29 行）。
+1. ~~`canonical`、`og:url`、`og:image` 指向上游 Pages 地址~~ —— **已处理**：现指向本仓库
+   GitHub Pages 地址 `https://a369096433.github.io/operation-ironhold/`。
+   若日后换绑自定义域名，需同步替换 `index.html` 头部这 5 处（第 10、14、17、18、29 行）。
 2. `og.jpg` 与 `screenshots/*.jpg` 仍是英文界面截图，未重制。
 3. `PROMPTS.md` 中的提示词已译为中文，因此不再是「逐字记录」；英文原文见上游仓库。
 4. 敌人代号（VIPER/COBRA 等）已本地化为中文代号，如需保留英文可回退。
 5. 仓库简介（GitHub 右上角 Description）与仓库名未改，需在仓库设置里手动编辑。
-6. 当前线上地址需携带 `?sharecode=` 参数才能访问（直接访问裸域名返回 403），
-   因此 `canonical` 与 `og:*` 里都保留了这个参数；换绑自定义域名后可去掉。
+6. ~~当前线上地址需携带 `?sharecode=` 参数~~ —— **已解决**：迁到 GitHub Pages 后是公开地址，
+   裸链接可直接访问，`canonical` 与 `og:*` 里的参数已全部去掉。
+   原 WorkBuddy 托管（`app.workbuddy.host`）已下线，本地发布目录与 `applications.yaml`
+   里的应用登记也一并移除；如需重新启用，得从头建一次应用。
 7. `screenshots/forest.jpg` 与 `screenshots/level-select.jpg` 是第三关与选关表的实拍，
    但 `gameplay.jpg`、`menu.jpg`、`scope.jpg` 与 `og.jpg` 仍是上游的英文界面截图、
    且没有第二关画面；如需要，可重新截图替换。
@@ -395,3 +458,21 @@ MIT，见 [LICENSE](LICENSE)。
 `colliders` / `worldSolid` / `groundMesh` / `mapRects` 逐项一致；
 三关各自的 `applyLevel()` 往返切换后也与该关的快照完全一致（第三关 134 / 7 / 1 / 130）。
 新增的环境系统只影响雾、光照、天空色标与远景剪影，不触碰任何物理数组。
+
+**部署迁到 GitHub Pages（非游戏逻辑改动）** —— 涉及 `index.html` 头部元信息、
+`tools/build-pages.mjs`、`tools/deploy-pages.mjs`、`.gitignore`、`.gitattributes` 与本文档。
+
+| 位置 | 改动 |
+| --- | --- |
+| `tools/build-pages.mjs`（新增） | 挑出 `index.html` / `og.jpg` / `screenshots/` 复制到 `.pages-dist/`，写入 `.nojekyll`；仅用 Node 内置模块，导出 `build()` 供发布脚本复用 |
+| `tools/deploy-pages.mjs`（新增） | 用 `hash-object` / `mktree` / `commit-tree` 把产物写成单提交并强推 `gh-pages`；不切分支、不动工作区；支持 `--dry-run` 与 `--keep` |
+| `.gitignore` | 忽略 `.pages-dist/` |
+| `.gitattributes` | `*.mjs` / `*.yml` / `*.yaml` 强制 LF，避免 shebang 行尾的 CR 让脚本在 Linux 上执行失败 |
+| `index.html` 头部 | `canonical`、`og:url`、`og:image`、`og:image:secure_url`、`twitter:image` 共 5 处从 WorkBuddy 托管地址改为 `https://a369096433.github.io/operation-ironhold/`，并去掉 `?sharecode=` 参数 |
+| 被否决的写法 | GitHub Actions 发布（`.github/workflows/pages.yml`）：向该目录推文件要求 token 带 `workflow` 权限，本地凭据只有 `repo` 权限，推送会被拒；改用分支发布后不再需要该权限 |
+
+游戏逻辑、渲染、AI、音频与三关地图完全没有变化——这次只换发布通道。
+原先的 WorkBuddy 托管已下线：`app.workbuddy.host` 上的分享链接失效，
+项目里用于该托管的 `site/` 发布目录、`.wbapp_*.genie` 应用描述与
+`.workbuddy/applications.yaml` 应用登记一并删除。`site/` 里的 `index.html` 与 `og.jpg`
+本来就是仓库文件的副本，删除不损失任何内容。

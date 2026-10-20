@@ -14,3 +14,6 @@ desktop.ini
 # 依赖目录，本项目里不应该出现
 node_modules/
 dist-wavedash/
+
+# GitHub Pages 的发布产物，由 tools/build-pages.mjs 从仓库里的源文件生成
+.pages-dist/

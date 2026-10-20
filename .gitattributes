@@ -1,0 +1,5 @@
+# 脚本与工作流在 Linux / CI 上运行，统一存为 LF。
+# 若换成 CRLF，shebang 行尾会多一个 CR，直接执行脚本时会报 "bad interpreter"。
+*.mjs   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
