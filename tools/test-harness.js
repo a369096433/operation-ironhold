@@ -1,7 +1,7 @@
-/* dev-only test harness, loaded manually over CDP; never referenced by index.html */
+/* 仅开发用的测试装置，通过 CDP 手动加载；index.html 从不引用它 */
 window.__errs = [];
 window.onerror = (m, s, l) => window.__errs.push(m + ' @' + l);
-window.addEventListener('unhandledrejection', e => window.__errs.push('rej: ' + e.reason));
+window.addEventListener('unhandledrejection', e => window.__errs.push('未处理拒绝：' + e.reason));
 
 window.H = {
   place(x, y, z, yaw, pitch){
@@ -9,17 +9,17 @@ window.H = {
     if (yaw !== undefined) player.yaw = yaw;
     if (pitch !== undefined) player.pitch = pitch;
     player.vel.set(0, 0, 0);
-    /* leftover recoil from an earlier shot silently re-aims the camera */
+    /* 上一发遗留的后坐会悄悄把相机重新瞄准 */
     player.recoilPitch = player.recoilYaw = player.recoilVelP = player.recoilVelY = 0;
     player.burstCount = 0; player.shake = 0; player.landShake = 0; player.fovKick = 0;
     for (const w of WEAPONS) w.spread = w.spreadBase;
   },
 
-  /* One frame of the real loop, so values written during update/render settle */
+  /* 真实主循环的一帧，让 update/render 期间写入的值稳定下来 */
   frame(){ return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
 
-  /* An open firing lane: a spot the player can stand with `d` metres of clear
-     air in front of it, so an accuracy test measures the gun and not a crate. */
+  /* 一条空旷射道：玩家可以站立、且正前方有 `d` 米净空的位置，
+     这样精度测试量的是枪，而不是木箱。 */
   lane(d){
     const R = new THREE.Raycaster();
     for (let i = 0; i < 900; i++){
@@ -36,28 +36,27 @@ window.H = {
         if (R.intersectObjects(worldSolid, false).length){ clear = false; break; }
       }
       if (!clear) continue;
-      /* yaw such that camera forward (-Z rotated by yaw) points down `dir` */
+      /* 令相机前向（-Z 绕 yaw 旋转）指向 `dir` 的偏航角 */
       return {x, z, tx, tz, yaw: Math.atan2(-dir.x, -dir.z)};
     }
     return null;
   },
 
-  /* The real "no phantom misses" test.
-     For each shot, cast the crosshair ray first. Whenever that ray lands on an
-     enemy hitbox, the game must register a hit; whenever it lands on the world,
-     it must not. Aim wanders (scope sway, recoil) are irrelevant — we compare
-     what the crosshair was on against what the shot did. */
+  /* 真正意义上的“没有幽灵漏判”测试。
+     每发先投一次准星射线。只要射线落在敌人受击盒上，游戏就必须记录命中；
+     落在世界上就不许记录。瞄准漂移（镜片晃动、后坐）无关紧要——
+     我们比较的是准星当时指着什么，以及这一枪实际做了什么。 */
   async fidelity(n, d, ads){
     const e = enemies.find(x => !x.dead);
     const L = H.lane(d);
-    if (!L) return {err:'no clear lane at ' + d + 'm'};
+    if (!L) return {err:'在以下距离没有空旷射道：' + d + 'm'};
     G.over = false; G.running = true; player.dead = false; window.__god = true;
     H.ads(!!ads);
     for (let f = 0; f < 24; f++) await H.frame();
     const R = new THREE.Raycaster();
     let onTarget = 0, registered = 0, falsePos = 0, ghostMiss = 0;
     for (let i = 0; i < n; i++){
-      /* jitter the aim so the crosshair lands on and off the body */
+      /* 抖动瞄准，让准星一会儿落在身上、一会儿落在外面 */
       const jx = rand(-0.010, 0.010), jy = rand(-0.008, 0.012);
       H.place(L.x, 0, L.z, L.yaw + jx, jy);
       e.dead = false; e.hp = 1e6; e.deathT = 0; e.flinch = 0; e.gunDropped = false;
@@ -65,7 +64,7 @@ window.H = {
       e.obj.position.set(L.tx, 0, L.tz); e.obj.updateMatrixWorld(true);
       G.kills = 0; G.over = false; G.running = true;
       rebuildHitMeshes();
-      await H.frame();                       // let the camera adopt the new aim
+      await H.frame();                       // 让相机采用新的瞄准
       e.obj.position.set(L.tx, 0, L.tz); e.obj.updateMatrixWorld(true);
       const fw = new THREE.Vector3(); camera.getWorldDirection(fw);
       R.set(camera.position, fw); R.far = WEAPONS[player.weapon].range;
@@ -87,23 +86,23 @@ window.H = {
             hitsWithoutTarget:falsePos};
   },
 
-  /* Fire n settled shots at a target d metres dead ahead and count the hits.
-     This is the "crosshair is on him, did it register" test. */
+  /* 朝正前方 d 米处的目标打 n 发稳定射击，统计命中数。
+     这就是“准星对着他，到底算不算命中”的测试。 */
   async accuracy(n, d, ads){
     const e = enemies.find(x => !x.dead);
     const L = H.lane(d);
-    if (!L) return {err: 'no clear lane at ' + d + 'm'};
+    if (!L) return {err: '在以下距离没有空旷射道：' + d + 'm'};
     G.over = false; G.running = true; player.dead = false; window.__god = true;
     H.wep(player.weapon);
     H.ads(!!ads);
-    /* let the ADS ease actually finish — it is a 0.2s lerp */
+    /* 让开镜过渡真正走完——它是 0.2s 的插值 */
     for (let f = 0; f < 24; f++) await H.frame();
     let hit = 0, shots = 0;
     for (let i = 0; i < n; i++){
       H.place(L.x, 0, L.z, L.yaw, 0);
-      /* Revive fully between shots. A sniper body shot kills outright, which
-         pulls the target out of enemyHitMeshes — every later round then has
-         nothing to hit and the test reads as a broken gun. */
+      /* 每发之间完全复活。狙击枪打身体就一击致死，这会把目标从
+         enemyHitMeshes 里摘掉——之后每一发都没有东西可打，
+         测试就会读成枪坏了。 */
       e.dead = false; e.hp = 1e6; e.deathT = 0; e.flinch = 0; e.gunDropped = false;
       e.obj.visible = true;
       e.obj.position.set(L.tx, 0, L.tz); e.obj.updateMatrixWorld(true);
@@ -145,20 +144,20 @@ window.H = {
   god(on){ window.__god = on; if (on){ player.hp = 100; player.armor = 50; } },
   clock(on){ window.__clock = on; },
 
-  /* ---- collision audit -------------------------------------------------- */
+  /* ---- 碰撞审计 -------------------------------------------------- */
 
-  /* every worldSolid mesh whose body is not covered by a movement collider.
-     Reports world-space box, so a "solid" you can walk through is obvious. */
+  /* 找出每个实体未被移动碰撞体覆盖的 worldSolid 网格。
+     报告世界空间包围盒，这样“声称实体却走得过去”的东西一目了然。 */
   audit(minSize){
     minSize = minSize === undefined ? 0.30 : minSize;
     const box = new THREE.Box3(), c = new THREE.Vector3(), s = new THREE.Vector3();
     const out = [];
     for (const m of worldSolid){
-      if (m.isInstancedMesh) continue;              // handled per-instance below
+      if (m.isInstancedMesh) continue;              // 下面按实例处理
       box.setFromObject(m); box.getCenter(c); box.getSize(s);
-      if (Math.min(s.x, s.z) < minSize && s.y < minSize) continue;   // trim / debris
-      /* sample the body of the object rather than just its centre: a long wall
-         can be half covered and still let you through at one end */
+      if (Math.min(s.x, s.z) < minSize && s.y < minSize) continue;   // 零碎件 / 碎片
+      /* 采样物体内部而不只是中心：一堵长墙可能被覆盖了一半，
+         另一头仍然能穿过去 */
       let covered = 0, tries = 0;
       for (let fx = 0.2; fx <= 0.8; fx += 0.3)
         for (let fz = 0.2; fz <= 0.8; fz += 0.3){
@@ -168,8 +167,8 @@ window.H = {
           tries++;
           if (blocked(px, pz, y0, y1, 0.05)) covered++;
         }
-      if (!tries) continue;                          // entirely above head height
-      if (covered === tries) continue;               // fully solid, fine
+      if (!tries) continue;                          // 完全在头部高度以上
+      if (covered === tries) continue;               // 完全实体，没问题
       out.push({name: m.name || m.geometry.type, cov: covered + '/' + tries,
                 at: [+c.x.toFixed(1), +c.y.toFixed(1), +c.z.toFixed(1)],
                 size: [+s.x.toFixed(1), +s.y.toFixed(1), +s.z.toFixed(1)]});
@@ -177,10 +176,9 @@ window.H = {
     return out;
   },
 
-  /* Drive the player along straight lines across the whole map using the real
-     movement code, and flag any step whose segment crosses a worldSolid surface.
-     If an object is shootable but has no collider, the player walks through it
-     and the crossing shows up here with the exact spot and the mesh hit. */
+  /* 用真实的移动代码驱动玩家沿直线穿越整张地图，并标出任何一步的线段
+     穿过了 worldSolid 表面。如果某个物体可以被射击却没有碰撞体，
+     玩家就会穿过去，这里会显示越过的准确位置和被击中的网格。 */
   tunnel(lines, probeY){
     lines = lines || 96;
     const R = new THREE.Raycaster();
@@ -191,7 +189,7 @@ window.H = {
 
     for (let i = 0; i < lines; i++){
       const a = (i / lines) * Math.PI * 2;
-      /* chords across the yard from the perimeter, hitting the interior at many angles */
+      /* 从周界横跨场院的弦线，以多种角度穿过内部 */
       const sx = Math.cos(a) * (HALF - 1.5), sz = Math.sin(a) * (HALF - 1.5);
       const ex = -sx * 0.9, ez = -sz * 0.9;
       const L = Math.hypot(ex - sx, ez - sz);
@@ -207,8 +205,8 @@ window.H = {
         const dx = nx - px, dz = nz - pz, d = Math.hypot(dx, dz);
         if (d > 1e-4){
           for (const y of ys){
-            /* a step that starts inside geometry is a separate problem; only
-               report a clean crossing of a surface during the step */
+            /* 起步就位于几何体内部是另一个问题；这里只报告
+               步进过程中干净地穿过表面的情况 */
             from.set(px, player.pos.y + y, pz);
             dir.set(dx / d, 0, dz / d);
             R.set(from, dir); R.far = d;
@@ -232,8 +230,8 @@ window.H = {
     return hitsOut;
   },
 
-  /* walk a dense grid at torso height and report any spot the player can stand
-     that is inside a worldSolid mesh — i.e. clipped into geometry */
+  /* 在躯干高度走一遍密集网格，报告玩家能站立、却位于 worldSolid 网格内部
+     的位置——也就是嵌进了几何体 */
   inside(step){
     step = step || 0.5;
     const R = new THREE.Raycaster();
@@ -242,15 +240,15 @@ window.H = {
     const bad = [];
     for (let x = -HALF + 1; x <= HALF - 1; x += step)
       for (let z = -HALF + 1; z <= HALF - 1; z += step){
-        if (blocked(x, z, 0.3, 1.65, 0.34)) continue;   // can't stand here anyway
-        /* inside a closed mesh, a ray out hits a back face in every direction */
+        if (blocked(x, z, 0.3, 1.65, 0.34)) continue;   // 反正站不住
+        /* 在封闭网格内部，朝任何方向射出都会撞到背面 */
         let enclosed = 0;
         for (const d of dirs){
           R.set(new THREE.Vector3(x, 1.0, z), d); R.far = 40;
           if (R.intersectObjects(worldSolid, false).length) enclosed++;
         }
         if (enclosed === 4){
-          /* four hits also happens in a corridor, so confirm with a short probe */
+          /* 走廊里也会出现四个方向都有命中，所以再用一次短探针确认 */
           let near = 0;
           for (const d of dirs){
             R.set(new THREE.Vector3(x, 1.0, z), d); R.far = 0.5;
@@ -262,8 +260,8 @@ window.H = {
     return bad;
   },
 
-  /* Fire each weapon at a target placed dead on the crosshair and report
-     whether the shot registered, plus the state of every feedback channel. */
+  /* 把目标正对在准星上，逐一试射每把武器，报告这一枪是否被记录，
+     以及每个反馈通道的状态。 */
   async wtest(){
     const out = [];
     const e = enemies.find(x => !x.dead);
@@ -271,7 +269,7 @@ window.H = {
       const w = WEAPONS[i];
       H.wep(i); H.ads(false);
       G.over = false; G.running = true; player.dead = false; window.__god = true;
-      /* player looking down -Z, target 12m ahead in the open */
+      /* 玩家朝 -Z 看，目标在正前方 12m 的空地上 */
       H.place(0, 0, 24, 0, 0);
       e.obj.position.set(0, 0, 12); e.obj.updateMatrixWorld(true);
       e.hp = 1e6; e.dead = false; e.flinch = 0;
@@ -279,7 +277,7 @@ window.H = {
       player.fireCooldown = 0; player.pumpT = 0; player.boltT = 0; player.reloadT = 0;
       const hp0 = e.hp;
       fireWeapon();
-      /* the flash is written during update, so it only exists after a frame */
+      /* 枪口焰是在 update 里写入的，所以只有过一帧之后才存在 */
       await H.frame();
       const flash = {sprite:+muzzleSprite.material.opacity.toFixed(2),
                      vmLight:+vmMuzzleLight.intensity.toFixed(1),
@@ -292,9 +290,9 @@ window.H = {
         const rel = s.mesh.position.clone().sub(camera.position);
         const rgt = new THREE.Vector3(); camera.getWorldDirection(rgt);
         rgt.cross(new THREE.Vector3(0,1,0)).normalize();
-        return +rel.dot(rgt).toFixed(2);            // >0 means it left to the right
+        return +rel.dot(rgt).toFixed(2);            // >0 表示弹壳向右抛出
       })();
-      /* ADS: request it and let the ease run */
+      /* 开镜：请求并让过渡跑完 */
       H.ads(true);
       await new Promise(r => setTimeout(r, 420));
       const adsK = +player.adsEase.toFixed(2);
@@ -303,7 +301,7 @@ window.H = {
       const crossHidden = UI.cross.classList.contains('hidden');
       H.ads(false);
       await new Promise(r => setTimeout(r, 300));
-      /* reload from a partial mag */
+      /* 从半满的弹匣开始换弹 */
       w.mag = 1; w.res = w.reserve; updateAmmoUI();
       startReload();
       const reloading = player.reloadT > 0 || player.pumpT > 0 || player.boltT > 0;
@@ -319,8 +317,8 @@ window.H = {
     return out;
   },
 
-  /* Watch every enemy for `secs`: flag any that end up inside geometry, or that
-     sit in one spot while not in combat. Resolves with a report. */
+  /* 观察每个敌人 `secs` 秒：标出任何最终卡进几何体的，
+     或不在战斗却停在原地不动的。以报告形式 resolve。 */
   watch(secs){
     const start = performance.now();
     const rec = enemies.map(e => ({n:e.name, inSolid:0, still:0, maxStill:0,
@@ -350,33 +348,32 @@ window.H = {
     });
   },
 
-  /* Charge the player into every collider from four sides and report any that
-     it ends up standing inside. This is the direct test of "solid means solid". */
+  /* 从四个方向把玩家撞向每个碰撞体，报告任何最终站在里面的情况。
+     这是“实体就是实体”的直接测试。 */
   charge(){
     const bad = [];
     const saved = player.pos.clone();
     for (let i = 0; i < colliders.length; i++){
       const c = colliders[i];
-      if (c.maxY <= 0.35) continue;                       // step-over lip
+      if (c.maxY <= 0.35) continue;                       // 可跨过的边棱
       const cx = (c.minX + c.maxX) / 2, cz = (c.minZ + c.maxZ) / 2;
       const hw = (c.maxX - c.minX) / 2, hd = (c.maxZ - c.minZ) / 2;
       for (const [dx, dz] of [[1,0],[-1,0],[0,1],[0,-1]]){
         const off = (dx ? hw : hd) + 3.0;
         const sx = cx - dx*off, sz = cz - dz*off;
         if (Math.abs(sx) > HALF - 0.6 || Math.abs(sz) > HALF - 0.6) continue;
-        if (blocked(sx, sz, 0.3, 1.65, 0.34)) continue;    // can't start there
+        if (blocked(sx, sz, 0.3, 1.65, 0.34)) continue;    // 起点就被挡住
         player.pos.set(sx, 0, sz); player.vel.set(0,0,0);
         for (let s = 0; s < 120; s++){
           moveSlide(player.pos, dx*0.07, dz*0.07, 0.36, player.height);
           const g = groundAt(player.pos.x, player.pos.z, player.pos.y + 1.2);
           if (g !== null && g < player.pos.y + 0.6) player.pos.y = g;
         }
-        /* standing inside the footprint, and not on top of it, is a failure */
+        /* 站在轮廓内部、而不是站在顶上，就是失败 */
         const p = player.pos;
         const inX = p.x > c.minX - 0.05 && p.x < c.maxX + 0.05;
         const inZ = p.z > c.minZ - 0.05 && p.z < c.maxZ + 0.05;
-        /* the body has to actually overlap the box in Y — walking under a
-           second-floor parapet is not a penetration */
+        /* 实体必须在 Y 方向上真的与盒子重叠——从二层女儿墙下走过不算穿透 */
         const overlapY = (p.y + player.height - 0.05) > c.minY + 0.02 && (p.y + 0.30) < c.maxY - 0.02;
         if (inX && inZ && overlapY){
           bad.push({i, at: [+p.x.toFixed(1), +p.y.toFixed(2), +p.z.toFixed(1)],
@@ -388,7 +385,7 @@ window.H = {
     return bad;
   },
 
-  /* try to leave the map in 32 directions; reports the furthest distance reached */
+  /* 尝试朝 32 个方向离开地图；报告到达的最远距离 */
   escape(){
     const saved = player.pos.clone();
     let worst = 0, at = null;
@@ -408,21 +405,21 @@ window.H = {
     return {furthestFromCentre: +worst.toFixed(2), at, wallAt: HALF};
   },
 
-  /* push the player at a wall from `dist` away and report whether they ended up
-     on the far side. dirs is a list of [dx,dz] unit-ish vectors. */
+  /* 从 `dist` 远处把玩家撞向墙，报告是否穿到了另一侧。
+     dirs 是一组 [dx,dz] 方向向量。 */
   ram(x, z, dirs, dist){
     dist = dist || 2.5;
     const res = [];
     for (const [dx, dz] of dirs){
       const sx = x - dx*dist, sz = z - dz*dist;
-      if (blocked(sx, sz, 0.3, 1.65, 0.34)){ res.push('start-blocked'); continue; }
+      if (blocked(sx, sz, 0.3, 1.65, 0.34)){ res.push('起点被阻塞'); continue; }
       player.pos.set(sx, 0, sz); player.vel.set(0,0,0);
       for (let i = 0; i < 90; i++){
         moveSlide(player.pos, dx*0.09, dz*0.09, 0.36, player.height);
         const g = groundAt(player.pos.x, player.pos.z, player.pos.y + 1.2);
         if (g !== null && g < player.pos.y + 0.6) player.pos.y = g;
       }
-      /* did we end up past the wall? */
+      /* 我们是不是跑到墙的另一边了？ */
       const travelled = (player.pos.x - sx)*dx + (player.pos.z - sz)*dz;
       res.push(+travelled.toFixed(2));
     }
@@ -430,4 +427,4 @@ window.H = {
   }
 };
 H.rig();
-'dev ready';
+'开发环境就绪';

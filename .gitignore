@@ -1,16 +1,16 @@
-# local scratch
+# 本地临时文件
 _*.js
 _*.png
 _og/
 *.local.*
 
-# editor and OS
+# 编辑器与操作系统
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# dependency dirs, should never appear in this project
+# 依赖目录，本项目里不应该出现
 node_modules/
 dist-wavedash/

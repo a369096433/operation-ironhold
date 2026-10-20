@@ -1,5 +1,5 @@
-/* Wavedash platform hooks, injected only into the Wavedash build (tools/build-wavedash.mjs).
-   Wraps the game's global endGame(); no-op when window.Wavedash is absent. */
+/* Wavedash 平台钩子，只注入 Wavedash 构建（tools/build-wavedash.mjs）。
+   包装游戏的全局 endGame()；window.Wavedash 不存在时为空操作。 */
 (function () {
   var W = window.Wavedash;
   if (!W) return;

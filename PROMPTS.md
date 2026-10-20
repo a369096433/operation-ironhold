@@ -1,217 +1,218 @@
-# Prompts
+# 提示词
 
-The prompts that specify the game, in the order they were given. Wording is unedited, typos
-included.
+以下是指定这款游戏的提示词，按给出的顺序排列。
+
+> **说明**：原文为英文，本文件是中文译文，便于中文读者阅读；
+> 逐字英文原文见上游仓库 <https://github.com/starknightt/operation-ironhold>。
 
 ---
 
-## 1. The specification
+## 1. 规格书
 
-Everything below arrived in one message.
+下面所有内容都在一条消息里发出。
 
 ```text
-build a complete realistic FPS shooter game in a single HTML file. everything inline — JS and CSS in the same file. no external dependencies except three.js from CDN (https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js). no build tools, no npm.
+在一个 HTML 文件里做一个完整、写实的 FPS 射击游戏。所有东西内联——JS 和 CSS 都在同一个文件里。除了从 CDN 加载的 three.js（https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js）之外不要有任何外部依赖。不要构建工具，不要 npm。
 
-**core gameplay:**
-- first person shooter, single player vs AI enemies
-- WASD movement, mouse look with pointer lock on click
-- left click to shoot, R to reload, shift to sprint, ctrl to crouch, space to jump
-- sprint adds FOV push effect and lowers weapon slightly
-- crouch lowers camera height and reduces movement speed
-- jump with landing camera shake
+**核心玩法：**
+- 第一人称射击，单人对抗 AI 敌人
+- WASD 移动，点击后用指针锁定实现鼠标视角
+- 左键射击，R 换弹，shift 冲刺，ctrl 蹲伏，空格跳跃
+- 冲刺要有 FOV 推进效果，并把武器略微放低
+- 蹲伏降低相机高度并减慢移动速度
+- 跳跃落地有镜头抖动
 
-**weapons system (switch with 1, 2, 3):**
-- slot 1: assault rifle — full auto, 30 round mag, moderate spread that increases with sustained fire, semi-auto toggle with V key
-- slot 2: shotgun — pump action, 8 shells, wide spread, high damage up close, pump animation between shots
-- slot 3: pistol — semi auto, 15 rounds, accurate, fast draw speed
-- each weapon needs a visible 3D viewmodel at bottom right — build them from three.js geometry (boxes, cylinders). add gloved hands holding the weapon
-- weapon sway on mouse movement, bob when walking synced to footsteps
-- muzzle flash (point light + sprite) on every shot
-- shell casings that eject and bounce on the ground with physics
-- reload animation (weapon dips down off screen and comes back)
-- draw animation when switching weapons
+**武器系统（用 1、2、3 切换）：**
+- 槽位 1：突击步枪——全自动，30 发弹匣，中等散布，持续射击时加大，V 键切换半自动
+- 槽位 2：霰弹枪——泵动，8 发，散布大，近距离伤害高，两发之间有泵动动画
+- 槽位 3：手枪——半自动，15 发，精准，出枪快
+- 每把武器都要在右下角有一个可见的 3D 手持模型——用 three.js 几何体搭（盒子、圆柱）。加上戴手套的手握着武器
+- 武器随鼠标移动摇摆，走路时与脚步同步晃动
+- 每次射击都有枪口焰（点光源 + 精灵）
+- 弹壳抛出，并在地面上带物理弹跳
+- 换弹动画（武器下沉出画面再回来）
+- 切换武器时有抽出动画
 
-**enemies (10 total):**
-- humanoid models built from three.js geometry (capsule body, sphere head, box limbs)
-- each enemy has a floating name tag and health bar above their head
-- enemy names: VIPER, GHOST, REAPER, HAVOC, STRIKER, COBRA, TALON, WOLF, DIESEL, SHADOW
-- enemies patrol waypoints around the map using simple pathfinding
-- when they spot you (line of sight + distance check), they stop, aim, and shoot with human-like reaction delay (300-800ms random)
-- enemies strafe left/right during combat
-- headshot detection — 2x damage on head hitbox
-- hit reaction animation (flinch backward)
-- death animation (ragdoll-style fall, weapon drops to ground)
-- enemies deal damage to player with visible red screen flash
+**敌人（共 10 个）：**
+- 用 three.js 几何体搭的人形模型（胶囊身体、球体头、盒子四肢）
+- 每个敌人头顶有浮动名牌和血条
+- 敌人代号：VIPER、GHOST、REAPER、HAVOC、STRIKER、COBRA、TALON、WOLF、DIESEL、SHADOW
+- 敌人沿地图上的路径点巡逻，使用简单的寻路
+- 发现你时（视线 + 距离判定），他们停下、瞄准，并以接近人类的反应延迟开火（随机 300-800ms）
+- 敌人在战斗中左右侧移
+- 爆头判定——命中头部受击盒造成 2 倍伤害
+- 命中反馈动画（向后晃动）
+- 死亡动画（布娃娃式倒地，武器掉在地上）
+- 敌人对玩家造成伤害时屏幕闪红
 
-**map design — abandoned warehouse district:**
-- 60x60 unit play area
-- concrete floor with grid texture (procedural)
-- shipping containers (large colored boxes) placed as cover throughout
-- two story building on one side with accessible second floor via ramp — gives sniper advantage
-- long corridor between container stacks (close quarters)
-- open center area with a destroyed vehicle (boxes arranged as car shape)
-- chain link fence sections around the perimeter (thin planes with alpha)
-- barrel stacks that block sightlines
-- crate clusters for cover
-- directional lighting with shadows casting from a sun position
-- fog in the distance for atmosphere
+**地图设计——废弃仓库区：**
+- 60x60 单位的战斗区域
+- 带网格贴图的混凝土地面（程序生成）
+- 集装箱（大型彩色盒子）作为掩体散布
+- 一侧有两层建筑，二层可经坡道抵达——给狙击手优势
+- 集装箱堆之间有长走廊（近距离交战）
+- 中央开阔地带有一辆被摧毁的车辆（用盒子摆成车的形状）
+- 周界周围有铁丝网段（带 alpha 的薄平面）
+- 油桶堆阻挡视线
+- 木箱群作为掩体
+- 方向光，从太阳位置投射阴影
+- 远处有雾，营造氛围
 
-**HUD:**
-- crosshair center screen (dynamic — expands when moving/shooting, contracts when still)
-- health bar bottom left with number (starts at 100)
-- armor bar below health (starts at 50, reduces damage by 50%)
-- ammo counter bottom right: current mag / total reserve
-- weapon name and icon next to ammo
-- kill feed top right — shows "YOU killed ENEMY" with headshot icon when applicable
-- hit marker (white X flash) when you land a shot
-- damage direction indicator (red arc on screen edge showing where damage came from)
-- minimap top left showing player position, enemy dots (red when spotted), and map walls
-- round timer top center counting down from 3:00
-- kill counter: "X / 10 eliminated"
+**HUD：**
+- 屏幕中央准星（动态——移动/射击时扩大，静止时收拢）
+- 左下角血条带数字（初始 100）
+- 血量下方护甲条（初始 50，减少 50% 伤害）
+- 右下角弹药计数：当前弹匣 / 总备弹
+- 弹药旁显示武器名与图标
+- 右上角击杀播报——显示“你 击杀 敌人”，爆头时带爆头图标
+- 命中标记（白色 X 闪光）
+- 受击方向指示（屏幕边缘的红色弧线，显示伤害来自哪里）
+- 左上角小地图，显示玩家位置、敌人圆点（发现时为红色）和地图墙体
+- 顶部中央回合倒计时，从 3:00 开始
+- 击杀计数：“X / 10 已消灭”
 
-**audio (all procedural Web Audio API, no external files):**
-- gunshot sounds per weapon (rifle = sharp crack, shotgun = deep boom, pistol = snap)
-- reload sound (metallic click)
-- footsteps synced to movement (concrete sound)
-- bullet impact sounds (different for wall vs enemy)
-- enemy death sound
-- hit confirmation beep
-- low health heartbeat warning when under 20hp
-- ambient industrial hum in background
+**音频（全部用 Web Audio API 程序生成，不带外部文件）：**
+- 每把武器各自的枪声（步枪 = 尖锐爆裂，霰弹枪 = 低沉轰鸣，手枪 = 干脆一响）
+- 换弹声（金属咔哒）
+- 与移动同步的脚步声（混凝土声）
+- 子弹命中声（墙面与敌人不同）
+- 敌人死亡声
+- 命中确认提示音
+- 低于 20 血时的心跳警告
+- 背景中的环境工业嗡鸣
 
-**post processing:**
-- bloom on muzzle flash and bright lights
-- vignette darkening at screen edges
-- slight color grading (desaturated, slightly blue shadows)
-- screen shake on taking damage and on shooting shotgun
+**后处理：**
+- 枪口焰与亮光的泛光
+- 屏幕边缘暗角
+- 轻微调色（去饱和、阴影略偏蓝）
+- 受伤与开霰弹枪时的屏幕抖动
 
-**game flow:**
-- start screen: "PRESS TO START" with title
-- pointer lock activates on click
-- kill all 10 enemies to win
-- die or run out of time to lose
-- end screen shows: kills, headshots, accuracy percentage, time survived
-- restart button on end screen
+**游戏流程：**
+- 开始界面：标题 + “点击开始”
+- 点击后激活指针锁定
+- 杀掉全部 10 个敌人即胜利
+- 死亡或超时即失败
+- 结束界面显示：击杀、爆头、命中率百分比、存活时间
+- 结束界面有重新开始按钮
 
-**performance:**
-- use merged geometries where possible to reduce draw calls
-- shadow maps at 2048
-- keep it running 60fps on mid-range hardware
-- use instanced mesh for repeated objects like crates and barrels
+**性能：**
+- 尽可能合并几何体以减少绘制调用
+- 阴影贴图 2048
+- 在中端硬件上保持 60fps
+- 对木箱、油桶这类重复物体使用实例化网格
 
-make it feel like a real game. weight to the movement, punch to the guns, tension in the combat. not a tech demo.
+让它感觉像一款真正的游戏。移动要有重量，枪要有冲击力，战斗要有张力。不要做成技术演示。
 ```
 
 ---
 
-## 2. Aim down sights, the sniper, and parkour
+## 2. 开镜、狙击枪与跑酷
 
-Added the fourth weapon, the scope, and the ability to climb onto things.
+加入了第四把武器、镜片，以及爬上物体的能力。
 
 ```text
-aim-down-sights (ADS) for all weapons on right click:
+右键为所有武器实现开镜瞄准（ADS）：
 
-assault rifle: FOV goes from 75 to 55, weapon model moves to center screen, tighter spread while aiming
-shotgun: FOV goes from 75 to 60, slight zoom, weapon centers
-pistol: FOV goes from 75 to 50, weapon raises to center with iron sight alignment
-sniper: FOV goes from 75 to 15, full scope overlay with dark circular vignette and mil-dot crosshair lines, subtle scope sway (slow sine wave on x and y), hold shift while scoped to hold breath (sway settles to near zero for 3 seconds)
+突击步枪：FOV 从 75 到 55，武器模型移到屏幕中央，瞄准时散布更紧
+霰弹枪：FOV 从 75 到 60，轻微放大，武器居中
+手枪：FOV 从 75 到 50，武器抬到中央并对齐机械瞄具
+狙击枪：FOV 从 75 到 15，完整镜片叠层，带深色圆形暗角和密位点十字线，轻微镜片漂移（x、y 上缓慢正弦），开镜时按住 shift 屏息（漂移在三秒内几乎归零）
 
-smooth transition in and out (0.2 sec lerp) for all weapons
-reduce movement speed by 40% while ADS
-right click to toggle ADS on/off
-disable normal crosshair while using sniper scope
+所有武器进出都要平滑过渡（0.2 秒插值）
+开镜时移动速度降低 40%
+右键切换开镜状态
+使用狙击镜时禁用普通准星
 
-sniper rifle as slot 4: bolt action, 5 round mag, one shot kill to body, headshot instant kill
-bolt cycle animation between shots (1.5 sec delay)
-loud crack sound, visible bullet tracer line
-switch weapons with 1-4 and scroll wheel
+狙击步枪作为槽位 4：栓动，5 发弹匣，打身体一枪致死，爆头立即击杀
+两发之间有拉枪机动画（1.5 秒延迟）
+响亮的爆裂声，可见的子弹曳光线
+用 1-4 和滚轮切换武器
 
-parkour/mantle: when player jumps near a container or crate edge and holds space, auto-mantle onto it (camera lifts up smoothly to the top)
-player can stand and walk on top of containers, crates, the vehicle, and barrel stacks
-double jump: tap space twice quickly for extra height
-increase base jump height slightly so player can reach container tops with mantle
-add collision on top of all objects so player doesn't fall through
+跑酷/翻越：玩家在集装箱或木箱边缘附近跳跃并按住空格时，自动翻上去（相机平滑抬到顶部）
+玩家可以站在集装箱、木箱、车辆和油桶堆上行走
+二段跳：快速点两次空格获得额外高度
+略微提高基础跳跃高度，让玩家能够翻上集装箱顶
+为所有物体顶部加上碰撞，玩家不会掉下去
 ```
 
 ---
 
-## 3. The bug list
+## 3. 缺陷清单
 
-The longest correction of the project. Collision, enemy AI and weapon reliability were all
-rebuilt off the back of it.
+本项目最长的一次修正。碰撞、敌人 AI 与武器可靠性都是在这一条之后重建的。
 
 ```text
-the game has major bugs that need fixing before this is shareable. go through everything and fix all of these:
+游戏有严重 bug，在可以分享之前必须修掉。把所有东西过一遍，修掉以下全部问题：
 
-**collision bugs (highest priority):**
-- player can walk through some walls. every single wall, container, crate, barrel, and building must have solid collision. the player should never pass through any object. check every single object in the scene has a collider and that the collision detection actually works
-- enemies are getting stuck inside containers and walls. add collision checks for enemy pathfinding so they navigate AROUND objects, never through them. if an enemy is stuck, teleport them to the nearest valid position outside any object
-- enemies stuck inside containers can still shoot the player but player can't shoot back. fix this — if there's no clear line of sight between player and enemy (raycast hits a wall/container), the enemy cannot deal damage
+**碰撞问题（最高优先级）：**
+- 玩家能穿过部分墙体。每一面墙、集装箱、木箱、油桶和建筑都必须有实体碰撞。玩家永远不该穿过任何物体。检查场景里每一个物体都有碰撞体，并且碰撞检测真的生效
+- 敌人会卡在集装箱和墙里。为敌人寻路加上碰撞检查，让他们绕着物体走，永远不穿过去。如果敌人卡住了，把他们传送到物体外最近的有效位置
+- 卡在集装箱里的敌人仍能射击玩家，玩家却打不到他们。修掉这个——如果玩家和敌人之间没有清晰视线（射线打到墙/集装箱），敌人就不能造成伤害
 
-**enemy AI fixes:**
-- enemies should never walk into walls or containers. their pathfinding needs to respect all solid objects
-- enemies should never stand still in the open doing nothing. if they're not in combat, they patrol. if they spot the player, they engage immediately
-- enemies should take cover behind containers and crates during combat, not just stand in the open
-- if an enemy can't reach the player, they should find an alternative path, not freeze
+**敌人 AI 修正：**
+- 敌人永远不该走进墙或集装箱。他们的寻路必须尊重所有实体
+- 敌人永远不该站在空地上什么都不做。不在战斗时就巡逻。发现玩家就立刻交战
+- 战斗中敌人应该躲到集装箱和木箱后面，而不是站在空地上
+- 如果敌人到不了玩家那里，他们要另找路径，而不是卡住不动
 
-**weapon and shooting fixes:**
-- make sure every weapon actually fires when clicking. if there's any delay or missed input, fix it
-- muzzle flash needs to be visible and punchy — bright flash + point light for 2 frames
-- bullet hit detection needs to be accurate. if crosshair is on the enemy, the bullet should hit. no phantom misses
-- shell casings should eject properly from the right side of the weapon
-- reload should feel smooth — weapon dips, mag change sound, weapon comes back
-- ADS (aim down sights) on right click must work for every weapon. if it's broken, fix it
-- sniper scope overlay must appear on right click with the sniper equipped
+**武器与射击修正：**
+- 确保每把武器点击时真的会开火。如果有任何延迟或丢失输入，修掉它
+- 枪口焰必须可见且有冲击力——明亮的闪光 + 点光源，持续 2 帧
+- 子弹命中检测必须准确。准星在敌人身上，子弹就该命中。不要有幽灵漏判
+- 弹壳应该从武器右侧正确抛出
+- 换弹手感要顺滑——武器下沉、换弹匣声、武器回位
+- 每把武器的右键开镜都必须可用。如果坏了，修掉
+- 装备狙击枪时右键必须出现镜片叠层
 
-**general polish:**
-- make sure the player cannot leave the map boundaries. add invisible walls at all edges
-- fix any z-fighting or flickering textures
-- make sure the minimap accurately shows wall positions and enemy dots
-- death screen and win screen must work properly with accurate stats
-- fix any console errors
+**整体打磨：**
+- 确保玩家无法离开地图边界。在所有边缘加上隐形墙
+- 修掉任何 z-fighting 或闪烁贴图
+- 确保小地图准确显示墙体位置和敌人圆点
+- 死亡界面与胜利界面必须正常工作，数据准确
+- 修掉任何控制台报错
 
-test everything after fixing. walk along every wall. try to walk through every container. watch every enemy for 30 seconds to make sure they're not stuck. fire every weapon and confirm it works. this needs to feel like a finished game, not a broken prototype.
+修完之后把所有东西测一遍。沿着每一面墙走。试着穿过每一个集装箱。观察每一个敌人 30 秒确认他们没卡住。每把武器都开一枪确认可用。这要感觉像一款做完的游戏，而不是一个坏掉的原型。
 ```
 
 ---
 
-## 4. The crosshair
+## 4. 准星
 
 ```text
-replace the current crosshair with a valorant-style competitive crosshair:
+把现在的准星换成 Valorant 风格的竞技准星：
 
-**inner lines:**
-- 4 lines (top, bottom, left, right)
-- each line is 4px long, 2px thick
-- offset 1px from center (small gap in the middle)
-- color: white with thin black outline for visibility on any background
-- no center dot
+**内侧刻线：**
+- 4 条线（上、下、左、右）
+- 每条长 4px、粗 2px
+- 距中心偏移 1px（中间留一个小缺口）
+- 颜色：白色，带细黑描边，保证在任何背景上都看得见
+- 不要中心点
 
-**outer lines:**
-- 4 lines (top, bottom, left, right)
-- each line is 3px long, 2px thick
-- offset 2px from the end of the inner lines (gap between inner and outer)
-- same white with black outline
+**外侧刻线：**
+- 4 条线（上、下、左、右）
+- 每条长 3px、粗 2px
+- 距内侧刻线末端偏移 2px（内外之间留空隙）
+- 同样是白色带黑描边
 
-**behavior:**
-- crosshair stays static when standing still
-- inner lines expand outward when moving or shooting (dynamic spread)
-- inner lines return to default position when standing still and not firing (0.15 sec lerp back)
-- outer lines don't move
-- no firing error on outer lines
-- no movement error on outer lines
-- crosshair disappears when using sniper scope ADS
-- crosshair stays visible for all other weapons during ADS
+**行为：**
+- 站立不动时准星静止
+- 移动或射击时内侧刻线向外扩张（动态散布）
+- 站立不动且未射击时内侧刻线回到默认位置（0.15 秒插值回位）
+- 外侧刻线不动
+- 外侧刻线不受射击误差影响
+- 外侧刻线不受移动误差影响
+- 使用狙击镜开镜时准星消失
+- 其他所有武器开镜时准星保持可见
 
-draw this with canvas overlay, not HTML elements. needs to be pixel-perfect and centered.
+用 canvas 叠层来画，不要用 HTML 元素。必须像素级精确并且居中。
 ```
 
 ---
 
-## 5. Enemy aim, the sky, and the M4 optic
+## 5. 敌人瞄准、天空与 M4 瞄具
 
-Sent with two screenshots: one looking up at the zenith, one down a container lane.
+随两条截图一起发送：一条朝天顶看，一条沿集装箱通道看。
 
 ```text
-time to fix some bugs, enemeies guns are pointing backwards if you see while shooting and our sky looks pixelated like you can see here and one more thing zooming in in m4 carbine is like trash i mean theres' no use if i can't zoom in more and see enemy
+该修几个 bug 了：射击的时候看过去，敌人的枪是朝后指的；我们的天空看起来有像素块，就像你在这里看到的那样；还有一件事，M4 卡宾枪的放大简直没法用，我是说如果不能放得更大、看清敌人，那放大有什么用
 ```
