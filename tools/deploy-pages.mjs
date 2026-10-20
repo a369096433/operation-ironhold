@@ -93,7 +93,32 @@ async function writeTree(outDir) {
   return { tree: git(['mktree'], rootEntries.join('\n') + '\n'), count: files.length };
 }
 
+/**
+ * commit-tree 需要作者身份，而很多机器上只配了 push 凭据、没配 user.name。
+ * 提前检查并给出可直接照抄的修复命令，好过让它抛一句 "Please tell me who you are"。
+ */
+function ensureIdentity() {
+  const read = (key) => {
+    try {
+      return git(['config', '--get', key]);
+    } catch {
+      return '';
+    }
+  };
+  const name = read('user.name');
+  const email = read('user.email');
+  if (!name || !email) {
+    throw new Error(
+      '发布需要一个 git 提交身份。请先设置（只影响本仓库，不动全局）：\n' +
+        '  git config user.name  "你的名字"\n' +
+        '  git config user.email "you@example.com"'
+    );
+  }
+}
+
 async function main() {
+  ensureIdentity();
+
   let info;
   if (keep) {
     const outDir = join(root, '.pages-dist');
