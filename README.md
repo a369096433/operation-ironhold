@@ -10,7 +10,8 @@
 一个完整的第一人称射击游戏，跑在浏览器标签页里。只有一个 HTML 文件，
 没有构建步骤，不需要包管理器，磁盘上也没有任何图片、音频或模型文件。
 
-**[在线试玩（原版，英文）](https://starknightt.github.io/operation-ironhold/)**
+**[在线试玩（中文版）](https://ironhold-zh.app.workbuddy.host/?sharecode=UDGPWQZB3V)**
+　|　[在线试玩（原版，英文）](https://starknightt.github.io/operation-ironhold/)
 
 ![游戏画面](screenshots/gameplay.jpg)
 
@@ -247,9 +248,12 @@ MIT，见 [LICENSE](LICENSE)。
 
 ### 待确认项
 
-1. `canonical`、`og:url`、`og:image` 仍指向上游 Pages 地址（`starknightt.github.io`）。
-   本仓库部署后应改为你自己的域名与图片。
+1. ~~`canonical`、`og:url`、`og:image` 仍指向上游 Pages 地址~~ —— **已处理**：已改为当前线上地址
+   `https://ironhold-zh.app.workbuddy.host/`。若日后更换部署域名，需同步替换 `index.html` 头部
+   这 5 处（第 10、14、17、18、29 行）。
 2. `og.jpg` 与 `screenshots/*.jpg` 仍是英文界面截图，未重制。
 3. `PROMPTS.md` 中的提示词已译为中文，因此不再是「逐字记录」；英文原文见上游仓库。
 4. 敌人代号（VIPER/COBRA 等）已本地化为中文代号，如需保留英文可回退。
 5. 仓库简介（GitHub 右上角 Description）与仓库名未改，需在仓库设置里手动编辑。
+6. 当前线上地址需携带 `?sharecode=` 参数才能访问（直接访问裸域名返回 403），
+   因此 `canonical` 与 `og:*` 里都保留了这个参数；换绑自定义域名后可去掉。
