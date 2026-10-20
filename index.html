@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<title>OPERATION IRONHOLD 铁幕行动 —— 仓库区</title>
-<meta name="description" content="十名敌人据守一处集装箱场，你有三分钟清场。整个游戏——世界、武器、AI 与音频——就是一个 290 KB 的 HTML 文件，无需构建，没有任何素材文件。">
+<title>OPERATION IRONHOLD 铁幕行动 —— 两处场院</title>
+<meta name="description" content="两处集装箱场、二十名守军，每处限时三分钟。整个游戏——两张地图、武器、AI 与音频——就是一个 320 KB 的 HTML 文件，无需构建，没有任何素材文件。">
 <meta name="author" content="Prasenjit">
 <meta name="theme-color" content="#0a0c0e">
 <link rel="canonical" href="https://ironhold-zh.app.workbuddy.host/?sharecode=UDGPWQZB3V">
@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="Operation Ironhold 铁幕行动">
 <meta property="og:url" content="https://ironhold-zh.app.workbuddy.host/?sharecode=UDGPWQZB3V">
 <meta property="og:title" content="Operation Ironhold 铁幕行动 —— 一个 HTML 文件里的第一人称射击游戏">
-<meta property="og:description" content="十名敌人据守一处集装箱场，你有三分钟清场。整个游戏——世界、武器、AI 与音频——就是一个 290 KB 的 HTML 文件，无需构建，没有任何素材文件。">
+<meta property="og:description" content="两处集装箱场、二十名守军，每处限时三分钟。整个游戏——两张地图、武器、AI 与音频——就是一个 320 KB 的 HTML 文件，无需构建，没有任何素材文件。">
 <meta property="og:image" content="https://ironhold-zh.app.workbuddy.host/og.jpg?sharecode=UDGPWQZB3V">
 <meta property="og:image:secure_url" content="https://ironhold-zh.app.workbuddy.host/og.jpg?sharecode=UDGPWQZB3V">
 <meta property="og:image:type" content="image/jpeg">
@@ -25,7 +25,7 @@
 <meta name="twitter:site" content="@Star_Knight12">
 <meta name="twitter:creator" content="@Star_Knight12">
 <meta name="twitter:title" content="Operation Ironhold 铁幕行动 —— 一个 HTML 文件里的第一人称射击游戏">
-<meta name="twitter:description" content="十名敌人据守一处集装箱场，你有三分钟清场。整个游戏——世界、武器、AI 与音频——就是一个 290 KB 的 HTML 文件，无需构建，没有任何素材文件。">
+<meta name="twitter:description" content="两处集装箱场、二十名守军，每处限时三分钟。整个游戏——两张地图、武器、AI 与音频——就是一个 320 KB 的 HTML 文件，无需构建，没有任何素材文件。">
 <meta name="twitter:image" content="https://ironhold-zh.app.workbuddy.host/og.jpg?sharecode=UDGPWQZB3V">
 <meta name="twitter:image:alt" content="沿集装箱场望出去的第一人称视角，M4 卡宾枪正向敌人开火，HUD 上显示小地图、计时器与弹药计数。">
 <style>
@@ -279,6 +279,17 @@
   #pause .t{font-size:34px;font-weight:800;letter-spacing:.3em;}
   #pause .s{font-size:11px;letter-spacing:.3em;color:rgba(223,230,236,.5);margin-top:12px;}
 
+  /* ---- 关卡过渡：黑场 + 关卡标题，用来盖住换场时的一次性开销 ---- */
+  #levelFade{position:absolute;inset:0;z-index:18;background:#05070a;opacity:0;pointer-events:none;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    transition:opacity .34s ease;}
+  #levelFade.on{opacity:1;}
+  #levelFade .tag,#levelFade .nm,#levelFade .hint{opacity:0;transition:opacity .3s ease;}
+  #levelFade.show .tag,#levelFade.show .nm,#levelFade.show .hint{opacity:1;}
+  #levelFade .tag{font-size:11px;letter-spacing:.55em;color:var(--amber);font-weight:700;}
+  #levelFade .nm{font-size:clamp(22px,3.4vw,36px);font-weight:800;letter-spacing:.22em;margin-top:12px;}
+  #levelFade .hint{font-size:11px;letter-spacing:.3em;color:rgba(223,230,236,.5);margin-top:16px;}
+
   #boot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:30;background:#05070a;
     font-size:11px;letter-spacing:.35em;color:rgba(223,230,236,.4);}
   #boot.hide{display:none;}
@@ -349,10 +360,16 @@
 
 <div id="pause"><div class="t">已暂停</div><div class="s">点击继续</div></div>
 
+<div id="levelFade">
+  <div class="tag">关卡 1 / 2</div>
+  <div class="nm">仓库区</div>
+  <div class="hint">继续肃清</div>
+</div>
+
 <div class="screen" id="startScreen">
   <div class="slug tl">IRONHOLD // 第 7 区</div>
   <div class="slug tr">集装箱场 04<br>网格 118-042</div>
-  <div class="slug br">10 名敌人 · 限时 03:00</div>
+  <div class="slug br">两处场院 · 每处 10 名敌人 · 03:00</div>
   <div class="col">
     <div class="eyebrow">机密 // 铁幕特遣队 IRONHOLD</div>
     <div class="title">仓库区<small>第 7 区 —— 敌占</small></div>
@@ -371,7 +388,7 @@
       <div class="key"><kbd>ESC</kbd> <span>暂停</span></div>
     </div>
     <div class="cta">点击开始</div>
-    <div class="hint">在倒计时结束前消灭全部 10 名敌人</div>
+    <div class="hint">每处场院限时 03:00，清空后直接转入下一处</div>
   </div>
 </div>
 
@@ -1614,6 +1631,11 @@ function box(w,h,d,x,y,z,mat,opt){
   return m;
 }
 
+/* 第一关的场地从下面这一行开始建造。记下此刻场景里已有的对象，
+   等第一关造完之后就能准确地把"属于场地的东西"挑出来收进一个组，
+   从而整体显隐——天空、光照、浮尘、远景都在此之前，两关共用。 */
+const _lvMarkA = new Set(scene.children);
+
 /* ---- 地面 ---- */
 {
   const g = new THREE.PlaneGeometry(HALF*2+16, HALF*2+16);
@@ -2718,7 +2740,10 @@ const CONTAINER_COLORS = [0xa85748, 0x53718c, 0x707f56, 0xab8a3f, 0x8b9096, 0x7e
    这样无论盒子多长，衰减宽度在世界单位下都保持恒定（拉伸的径向渐变做不到）。
    所有内容合并进一个缓冲，因此只花一次绘制调用。
    ------------------------------------------------------------------------- */
-const contactShadows = (()=>{
+const contactShadows = makeContactShadows();
+/* 每关各造一份：裙边缓冲是批量合并的，合并之后再往里加就无效了，
+   所以第二关需要自己的实例（见 5.1 关卡系统）。 */
+function makeContactShadows(){
   const pos = [], alp = [], idx = [];
   let base = 0;
   const FEATHER = 0.62;
@@ -2771,7 +2796,11 @@ const contactShadows = (()=>{
       scene.add(m);
     }
   };
-})();
+}
+
+/* 第一关的战斗区到此结束。下面开始的是围栏之外的远景——它属于两关共用的
+   环境，不参与换场，所以先在这里取一次快照，稍后用来把它排除在关卡组之外。 */
+const _lvPlayEnd = new Set(scene.children);
 
 /* -------------------------------------------------------------------------
    围栏之外的那片城区。这里既不能碰撞也不能射击——它存在的意义是让
@@ -2925,6 +2954,9 @@ const contactShadows = (()=>{
   }
 }
 
+/* 远景建造完毕：这里新增的对象就是共用的"城外"，不属于任何一关。 */
+const _lvBg = new Set(scene.children.filter(o => !_lvPlayEnd.has(o)));
+
 /* 每个真正接触混凝土的轮廓都得到一条裙边；堆叠的箱子坐在邻居身上，跳过 */
 for (const c of colliders){
   if (c.minY > 0.22) continue;
@@ -2936,6 +2968,428 @@ for (const c of colliders){
 }
 for (const e of extraShadows) contactShadows.add(e.x, e.z, e.hw, e.hd, e.s);
 contactShadows.build();
+
+/* =========================================================================
+   5.1 关卡系统 —— 第二关「南货柜堆场」
+
+   两关共用同一套光照、天空、浮尘、太阳光柱与围栏之外的远景（它们都在上面的
+   标记点之前或之后创建，不进任何关卡组）；只有战斗区不同：地面、周界、
+   集装箱、道具与地面标识。
+
+   每关的场地是一个 THREE.Group，切换时整组显隐。物理查询用的六个数组
+   （colliders / worldSolid / groundMesh / ceilMesh / mapRects / extraShadows）
+   是每关各自的副本，切换时在原地替换内容——所有碰撞与射线函数持有的都是
+   这些数组的引用本身，因此一行都不用改。
+
+   建造顺序是刻意的：第一关的接触阴影已经合并完毕（合并后再往里加无效），
+   所以先把第一关的副本收好，并把查询数组腾空，再用同一套建造函数造第二关，
+   最后把第一关恢复成活动关卡。两关都在加载期一次性建好，换场时只做显隐，
+   不会有构建开销。
+   ========================================================================= */
+const LEVELS = [];
+
+/* 把某一关的查询数据装回那六个全局数组。函数声明会提升，所以下面的构建
+   代码在 `const SPAWN` 之前也能安全调用它（它不碰 SPAWN）。 */
+function _lvSwapArrays(L){
+  const put = (arr, src) => { arr.length = 0; for (let i=0;i<src.length;i++) arr.push(src[i]); };
+  put(colliders,     L.colliders);
+  put(worldSolid,    L.worldSolid);
+  put(groundMesh,    L.groundMesh);
+  put(ceilMesh,      L.ceilMesh);
+  put(mapRects,      L.mapRects);
+  put(extraShadows,  L.extraShadows);
+}
+
+/* ---- 关卡 1：把上面造出来的战斗区收进一个组 ---- */
+{
+  const g = new THREE.Group(); g.name = 'level-1';
+  scene.add(g);
+  for (const o of scene.children.slice())
+    if (o !== g && !_lvMarkA.has(o) && !_lvBg.has(o)) g.add(o);
+  LEVELS.push({
+    key:'warehouse', map:'第 7 区', name:'仓库区', hint:'继续肃清',
+    spawn:{ x:0, z:24 },
+    colliders: colliders.slice(), worldSolid: worldSolid.slice(),
+    groundMesh: groundMesh.slice(), ceilMesh: ceilMesh.slice(),
+    mapRects: mapRects.slice(), extraShadows: extraShadows.slice(),
+    group:g
+  });
+}
+
+/* ---- 关卡 2：南货柜堆场 ---- */
+{
+  /* 腾空查询数组，第二关的场地要用同一套建造函数写进去 */
+  colliders.length = 0; worldSolid.length = 0; groundMesh.length = 0;
+  ceilMesh.length = 0; mapRects.length = 0; extraShadows.length = 0;
+  const _lvMarkB = new Set(scene.children);
+
+  /* --- 地面 --- */
+  {
+    const g2 = new THREE.PlaneGeometry(HALF*2+16, HALF*2+16);
+    g2.rotateX(-PI/2);
+    const floorB = new THREE.Mesh(g2, MAT.floor);
+    floorB.receiveShadow = true;
+    scene.add(floorB); worldSolid.push(floorB); groundMesh.push(floorB);
+  }
+
+  /* --- 周界：与第一关同一套做法（铁丝网 + 立柱 + 隐形硬墙） --- */
+  {
+    const H = 3.3, geos = [];
+    const YAXIS = new THREE.Vector3(0,1,0);
+    for (const side of [0,1,2,3]){
+      for (let i=-HALF; i<HALF; i+=5){
+        const gp2 = new THREE.PlaneGeometry(5, H);
+        const uv = gp2.attributes.uv;
+        for (let k=0;k<uv.count;k++) uv.setXY(k, uv.getX(k)*3.0, uv.getY(k)*2.0);
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion(), pos = new THREE.Vector3();
+        if (side===0) pos.set(i+2.5, H/2, -HALF);
+        else if (side===1){ q.setFromAxisAngle(YAXIS, PI/2); pos.set(HALF, H/2, i+2.5); }
+        else if (side===2) pos.set(i+2.5, H/2, HALF);
+        else { q.setFromAxisAngle(YAXIS, PI/2); pos.set(-HALF, H/2, i+2.5); }
+        m.compose(pos, q, new THREE.Vector3(1,1,1));
+        gp2.applyMatrix4(m); geos.push(gp2);
+      }
+    }
+    const fenceB = new THREE.Mesh(mergeGeoms(geos), MAT.fence);
+    fenceB.castShadow = fenceB.receiveShadow = false;
+    scene.add(fenceB); worldSolid.push(fenceB);
+
+    /* 立柱 */
+    const postGeo = new THREE.CylinderGeometry(0.09,0.09,H+0.35,7);
+    const posts = [];
+    for (let i=-HALF;i<=HALF;i+=5) posts.push([i,-HALF],[i,HALF],[-HALF,i],[HALF,i]);
+    const pm = new THREE.InstancedMesh(postGeo, MAT.darkMetal, posts.length);
+    const dm = new THREE.Object3D();
+    posts.forEach((p,i)=>{
+      dm.position.set(p[0],(H+0.35)/2,p[1]);
+      dm.rotation.set(0,0,0); dm.scale.setScalar(1);
+      dm.updateMatrix(); pm.setMatrixAt(i,dm.matrix);
+    });
+    pm.castShadow = true; pm.instanceMatrix.needsUpdate = true;
+    scene.add(pm);
+
+    /* 隐形硬墙，谁都别想跑出去 */
+    const invis = new THREE.MeshBasicMaterial({visible:false});
+    const t = 1.2;
+    for (const [x,z,w,d] of [[0,-HALF-t/2,HALF*2+t*2,t],[0,HALF+t/2,HALF*2+t*2,t],
+                             [-HALF-t/2,0,t,HALF*2+t*2],[HALF+t/2,0,t,HALF*2+t*2]]){
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w,12,d), invis);
+      m.position.set(x,6,z); scene.add(m); worldSolid.push(m); addCollider(x,0,z,w,12,d);
+    }
+  }
+
+  /* --- 地面标识：十字主通道的虚线、泊位开口框、区号喷字 --- */
+  {
+    const SPAN = HALF*2+16, S = 1024, PPM = S/SPAN;
+    const c = document.createElement('canvas'); c.width = c.height = S;
+    const x = c.getContext('2d');
+    const WX = wx => (wx + SPAN/2)*PPM, WZ = wz => (wz + SPAN/2)*PPM, M = m => m*PPM;
+    const paint = 'rgba(196,164,58,', paintW = 'rgba(206,206,198,';
+
+    /* 低频污渍 */
+    for (let i=0;i<90;i++){
+      const px=Math.random()*S, py=Math.random()*S, r=rand(50,340);
+      const g2=x.createRadialGradient(px,py,0,px,py,r);
+      const dark = Math.random()<0.75;
+      const col = dark ? '24,23,21' : '140,138,132';
+      g2.addColorStop(0,`rgba(${col},${dark?rand(0.05,0.18):rand(0.03,0.08)})`);
+      g2.addColorStop(1,`rgba(${col},0)`);
+      x.fillStyle=g2; x.beginPath(); x.arc(px,py,r,0,7); x.fill();
+    }
+
+    /* 十字主通道的中线 */
+    x.setLineDash([M(2.2), M(1.8)]);
+    x.lineWidth = M(0.20); x.strokeStyle = paint+'0.42)';
+    x.beginPath(); x.moveTo(WX(0), WZ(-26)); x.lineTo(WX(0), WZ(26)); x.stroke();
+    x.beginPath(); x.moveTo(WX(-27), WZ(0)); x.lineTo(WX(27), WZ(0)); x.stroke();
+    x.setLineDash([]);
+
+    /* 四个装卸泊位的开口框 */
+    x.strokeStyle = paint+'0.62)'; x.lineWidth = M(0.26);
+    for (const [bx,bz] of [[13,-9.6],[13,9.6],[-13,-9.6],[-13,9.6]])
+      x.strokeRect(WX(bx-4.4), WZ(bz-0.8), M(8.8), M(1.6));
+
+    /* 喷字 */
+    const stencil = (txt,wx,wz,size,rot,al)=>{
+      x.save(); x.translate(WX(wx), WZ(wz)); x.rotate(rot);
+      x.fillStyle = paintW+al+')';
+      x.font = `bold ${M(size)}px "Arial Narrow", Arial, sans-serif`;
+      x.textAlign='center'; x.textBaseline='middle';
+      x.fillText(txt,0,0); x.restore();
+    };
+    stencil('第 9 区', 0, 12.4, 2.4, 0, 0.26);
+    stencil('装卸泊位', 13, 4.6, 1.1, 0, 0.30);
+    stencil('限速 5 km/h', -2.6, -18, 1.0, PI/2, 0.22);
+    stencil('清空作业区', -20, 16, 1.2, 0, 0.20);
+
+    /* 把漆磨掉，免得看起来像刚刷上去的 */
+    x.globalCompositeOperation='destination-out';
+    for (let i=0;i<300;i++){
+      const px=Math.random()*S, py=Math.random()*S, r=rand(5,48);
+      const g2=x.createRadialGradient(px,py,0,px,py,r);
+      g2.addColorStop(0,`rgba(0,0,0,${rand(0.25,0.9)})`); g2.addColorStop(1,'rgba(0,0,0,0)');
+      x.fillStyle=g2; x.beginPath(); x.arc(px,py,r,0,7); x.fill();
+    }
+    x.globalCompositeOperation='source-over';
+
+    /* 油渍与积水 */
+    for (let i=0;i<18;i++){
+      const px=Math.random()*S, py=Math.random()*S, r=rand(12,58);
+      const g2=x.createRadialGradient(px,py,0,px,py,r);
+      g2.addColorStop(0,`rgba(12,11,10,${rand(0.30,0.60)})`);
+      g2.addColorStop(0.5,`rgba(18,17,15,${rand(0.15,0.30)})`);
+      g2.addColorStop(1,'rgba(20,18,16,0)');
+      x.fillStyle=g2;
+      x.save(); x.translate(px,py); x.rotate(Math.random()*7); x.scale(1,rand(0.5,1.0));
+      x.beginPath(); x.arc(0,0,r,0,7); x.fill(); x.restore();
+    }
+    for (let i=0;i<10;i++){
+      const px=Math.random()*S, py=Math.random()*S, r=rand(24,90);
+      const g2=x.createRadialGradient(px,py,r*0.3,px,py,r);
+      g2.addColorStop(0,`rgba(30,38,46,${rand(0.20,0.36)})`);
+      g2.addColorStop(1,'rgba(34,42,50,0)');
+      x.fillStyle=g2;
+      x.save(); x.translate(px,py); x.scale(rand(0.7,1.4),rand(0.5,1.0));
+      x.beginPath(); x.arc(0,0,r,0,7); x.fill(); x.restore();
+    }
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = MAXANISO; tex.encoding = THREE.sRGBEncoding;
+    const og = new THREE.PlaneGeometry(SPAN, SPAN); og.rotateX(-PI/2);
+    const ov = new THREE.Mesh(og, new THREE.MeshBasicMaterial({
+      map:tex, transparent:true, depthWrite:false,
+      polygonOffset:true, polygonOffsetFactor:-1, polygonOffsetUnits:-1 }));
+    ov.position.y = 0.008; ov.renderOrder = 0;
+    scene.add(ov);
+  }
+
+  /* --- 集装箱：四个 U 形装卸泊位 + 几处散箱 ---
+     布局规则：每个箱体都是"孤岛"（互不连成闭环），中央十字主通道始终贯通，
+     因此整张图是连通的。这一条对敌人寻路用的泛洪填充是硬要求：一旦出现
+     围死的口袋，巡逻路线被吸附进去，回合会卡在"找不到最后一个敌人"上。 */
+  {
+    const CW=2.7, CH=2.85, CL=9.0;
+    const geo = new THREE.BoxGeometry(CW, CH, CL);
+    { const uv = geo.attributes.uv;
+      for (let i=0;i<uv.count;i++) uv.setXY(i, uv.getX(i)*2.4, uv.getY(i)*1.0); }
+    const COLORS = [0x8f4a3c, 0x44607a, 0x5f6f48, 0x93762f, 0x777d84, 0x6b4438, 0x3f625c];
+    /* [x, z, 是否横置, 叠层数] */
+    const LIST = [
+      /* 东北泊位（三面围合，开口朝南） */
+      [ 10.0,-13.0, 0, 0], [ 16.0,-13.0, 0, 1], [ 13.0,-19.4, 1, 0],
+      /* 西北泊位 */
+      [-10.0,-13.0, 0, 0], [-16.0,-13.0, 0, 0], [-13.0,-19.4, 1, 1],
+      /* 东南泊位（开口朝北） */
+      [ 10.0, 13.0, 0, 1], [ 16.0, 13.0, 0, 0], [ 13.0, 19.4, 1, 0],
+      /* 西南泊位 */
+      [-10.0, 13.0, 0, 0], [-16.0, 13.0, 0, 0], [-13.0, 19.4, 1, 0],
+      /* 东西两侧的散箱 */
+      [ 24.5,  0.0, 0, 0], [-24.5,  0.0, 0, 1],
+      /* 主通道中的两处横箱，给开阔的十字一点中距离掩体 */
+      [ 12.0,  0.0, 0, 0], [-12.0,  0.0, 0, 0],
+      /* 封住北端通道尽头的横箱 */
+      [  0.0,-25.0, 1, 0]
+    ];
+    const entries = [];
+    LIST.forEach(([x,z,rot,stack],i)=>{
+      const w = rot ? CL : CW, l = rot ? CW : CL;
+      for (let k=0;k<=stack;k++){
+        entries.push({ x, y:k*CH + CH/2, z, rotY: rot?PI/2:0,
+                       color: COLORS[(i+k)%COLORS.length] });
+        addCollider(x, k*CH, z, w, CH, l);
+      }
+      mapRects.push({x, z, w, d:l, c:'#5a6068'});
+    });
+    instancedByColor(geo, MAT.container, entries);
+
+    /* 箱体标识：与第一关同一种做法——一张图集，每个长面一张贴花，
+       最后合并成一次 alpha 测试绘制。少了这层，第二关的箱子会明显比第一关新。 */
+    {
+      const COLS=4, ROWS=4, CELLS=COLS*ROWS, CW2=512, CH2=256;
+      const ac = document.createElement('canvas');
+      ac.width = COLS*CW2; ac.height = ROWS*CH2;
+      const ax = ac.getContext('2d');
+      const owners = ['MAEU','TGHU','CSQU','HLXU','MSCU','OOLU','TCNU','GESU','APZU','DFSU'];
+      for (let cell=0; cell<CELLS; cell++){
+        const ox=(cell%COLS)*CW2, oy=((cell/COLS)|0)*CH2;
+        ax.save(); ax.translate(ox,oy);
+        ax.fillStyle='rgba(228,228,224,0.74)';
+        ax.font='bold 52px "Arial Narrow", Arial, sans-serif';
+        ax.textAlign='left'; ax.textBaseline='alphabetic';
+        ax.fillText(pick(owners)+' '+randI(100,999)+' '+randI(100,999)+'-'+randI(0,9), 22, 58);
+        ax.font='bold 28px "Arial Narrow", Arial, sans-serif';
+        ax.fillStyle='rgba(232,232,228,0.60)';
+        ax.fillText(pick(['45 G1','22 G1','42 G1','22 U1']), 22, 94);
+        ax.font='bold 19px "Arial Narrow", Arial, sans-serif';
+        ax.fillStyle='rgba(228,228,224,0.38)';
+        ax.fillText('MAX GROSS  '+randI(28,32)+',480 KG', 22, 124);
+        ax.fillText('TARE        '+randI(3,4)+','+randI(100,990)+' KG', 22, 148);
+        ax.fillText('CU CAP      '+randI(60,86)+'.'+randI(1,9)+' CU M', 22, 172);
+        /* 把漆做旧 */
+        ax.globalCompositeOperation='destination-out';
+        for (let i=0;i<70;i++){
+          const px=rand(0,CW2), py=rand(0,CH2), r=rand(4,26);
+          const g3=ax.createRadialGradient(px,py,0,px,py,r);
+          g3.addColorStop(0,`rgba(0,0,0,${rand(0.2,0.9)})`); g3.addColorStop(1,'rgba(0,0,0,0)');
+          ax.fillStyle=g3; ax.beginPath(); ax.arc(px,py,r,0,7); ax.fill();
+        }
+        ax.globalCompositeOperation='source-over';
+        ax.restore();
+      }
+      const atlas = new THREE.CanvasTexture(ac);
+      atlas.anisotropy = MAXANISO; atlas.encoding = THREE.sRGBEncoding;
+
+      const DW=2.7, DH=1.35, parts=[];
+      entries.forEach((e,i)=>{
+        const cell = i % CELLS;
+        const u0=(cell%COLS)/COLS, v0 = 1 - (((cell/COLS)|0)+1)/ROWS;
+        for (const s of [1,-1]){
+          const q = new THREE.PlaneGeometry(DW,DH);
+          const uv = q.attributes.uv;
+          for (let k=0;k<uv.count;k++) uv.setXY(k, u0 + uv.getX(k)/COLS, v0 + uv.getY(k)/ROWS);
+          const rot = new THREE.Matrix4().makeRotationY(e.rotY + s*PI/2);
+          const local = new THREE.Vector3(s*(CW/2+0.012), 0.60, s*-2.55);
+          local.applyAxisAngle(new THREE.Vector3(0,1,0), e.rotY);
+          const mtx = new THREE.Matrix4().multiplyMatrices(
+            new THREE.Matrix4().makeTranslation(e.x+local.x, e.y+local.y, e.z+local.z), rot);
+          q.applyMatrix4(mtx); parts.push(q);
+        }
+      });
+      const dec = new THREE.Mesh(mergeGeoms(parts), new THREE.MeshStandardMaterial({
+        map:atlas, transparent:true, alphaTest:0.06, roughness:0.85, metalness:0.0,
+        polygonOffset:true, polygonOffsetFactor:-3, polygonOffsetUnits:-3, side:THREE.DoubleSide
+      }));
+      dec.castShadow=false; dec.receiveShadow=true;
+      scene.add(dec);
+    }
+  }
+
+  /* --- 混凝土隔离墩 --- */
+  {
+    const g = new THREE.BoxGeometry(2.5,1.05,0.55);
+    const LIST = [
+      [-3.2,-9.6,0],[ 3.2,-9.6,0],[ 0.0,-14.5,PI/2],[ 8.0,-4.2,0],[-8.0,-4.2,0],
+      [-3.2, 9.6,0],[ 3.2, 9.6,0],[ 0.0, 14.5,PI/2],[ 8.0, 4.2,0],[-8.0, 4.2,0],
+      [ 19.5,-6.6,PI/2],[-19.5,-6.6,PI/2],[ 19.5, 6.6,PI/2],[-19.5, 6.6,PI/2],
+      [ 20.0,-11.0,PI/2],[-20.0,-11.0,PI/2],[ 20.0, 11.0,PI/2],[-20.0, 11.0,PI/2]
+    ];
+    const im = new THREE.InstancedMesh(g, MAT.concrete, LIST.length);
+    const dm = new THREE.Object3D();
+    LIST.forEach(([x,z,ry],i)=>{
+      dm.position.set(x, 0.525, z); dm.rotation.set(0, ry, 0); dm.scale.setScalar(1);
+      dm.updateMatrix(); im.setMatrixAt(i, dm.matrix);
+      const w = ry ? 0.55 : 2.5, d = ry ? 2.5 : 0.55;
+      addCollider(x, 0, z, w, 1.05, d);
+      mapRects.push({x, z, w, d, c:CLUTTER_MAP});
+    });
+    im.castShadow = im.receiveShadow = true; im.instanceMatrix.needsUpdate = true;
+    scene.add(im); worldSolid.push(im); groundMesh.push(im);
+  }
+
+  /* --- 木箱堆（实例化，部分叠放） --- */
+  {
+    const g = new THREE.BoxGeometry(1.1,1.1,1.1);
+    /* [x, z, 叠放层号] */
+    const LIST = [
+      [ 6.4,-7.2,0],[ 7.6,-7.2,0],[ 7.0,-6.1,0],[ 7.0,-7.2,1],
+      [-6.4,-7.2,0],[-7.6,-7.2,0],[-7.0,-6.1,0],
+      [ 6.4, 7.2,0],[ 7.6, 7.2,0],[ 7.0, 6.1,0],[ 7.0, 7.2,1],
+      [-6.4, 7.2,0],[-7.6, 7.2,0],[-7.0, 6.1,0],
+      [ 22.2,-18.6,0],[ 23.4,-18.6,0],[ 22.8,-17.5,0],
+      [-22.2, 18.6,0],[-23.4, 18.6,0],[-22.8, 17.5,0]
+    ];
+    const entries = LIST.map(([x,z,row],i)=>({
+      x, y: 0.55 + row*1.1, z, rotY: (i%3)*0.05 - 0.05,
+      color: [0x8a7250,0x7a6444,0x94805c][i%3]
+    }));
+    LIST.forEach(([x,z,row])=>{
+      addCollider(x, row*1.1, z, 1.1, 1.1, 1.1);
+      if (row===0) mapRects.push({x, z, w:1.1, d:1.1, c:CLUTTER_MAP});
+    });
+    instancedByColor(g, MAT.crate, entries);
+  }
+
+  /* --- 油桶 --- */
+  {
+    const g = new THREE.CylinderGeometry(0.29,0.29,0.88,10);
+    const LIST = [
+      [ 14.6,-21.6],[ 15.5,-21.9],[ 14.9,-22.6],
+      [-21.4,  6.4],[-22.3,  6.9],
+      [  6.2, 12.6],[  7.1, 13.1],[  6.6, 13.9],
+      [ -6.2,-12.6],[ -7.1,-13.1]
+    ];
+    const entries = LIST.map(([x,z],i)=>({
+      x, y:0.44, z, rotY:i*0.7,
+      color:[0x4c5a45,0x6b4a35,0x5a5f63][i%3]
+    }));
+    LIST.forEach(([x,z])=>{
+      addCollider(x, 0, z, 0.58, 0.88, 0.58);
+      extraShadows.push({x, z, hw:0.34, hd:0.34, s:0.5});
+    });
+    instancedByColor(g, MAT.barrel, entries);
+  }
+
+  /* --- 沙袋工事 --- */
+  {
+    const g = new THREE.BoxGeometry(0.66,0.26,0.34);
+    const entries = [];
+    for (const [x0,z0] of [[-4.6, 20.4],[ 4.6,-20.4]]){
+      for (let row=0; row<4; row++)
+        for (let k=0; k<6; k++)
+          entries.push({
+            x: x0 + (k-2.5)*0.68 + (row%2 ? 0.34 : 0),
+            y: 0.14 + row*0.26,
+            z: z0 + (row%2 ? 0.06 : -0.02),
+            rotY: rand(-0.05,0.05), color: 0x6f6a54
+          });
+      addCollider(x0, 0, z0, 4.4, 1.1, 0.5);
+      mapRects.push({x:x0, z:z0, w:4.4, d:0.5, c:CLUTTER_MAP});
+    }
+    instancedByColor(g, MAT.concrete, entries);
+  }
+
+  /* --- 场院灯杆与垃圾斗 --- */
+  for (const [x,z] of [[-19.0,-1.2],[19.0,1.2]]){
+    box(0.26,7.2,0.26, x,0,z, MAT.darkMetal, {uvScale:[1,1]});
+    box(1.5,0.16,0.16, x,7.05,z, MAT.darkMetal, {collide:false, solid:false});
+    box(0.5,0.16,0.72, x,6.95,z, MAT.metal, {collide:false, solid:false, cast:false});
+    extraShadows.push({x, z, hw:0.5, hd:0.5, s:0.45});
+  }
+  for (const [x,z] of [[ 19.5,-23.5],[-19.5, 23.5]])
+    box(2.4,1.35,1.5, x,0,z, MAT.darkMetal, {uvScale:[1,1], map:CLUTTER_MAP});
+
+  /* --- 裙边：第二关自己的缓冲 --- */
+  {
+    const csB = makeContactShadows();
+    for (const c of colliders){
+      if (c.minY > 0.22) continue;
+      const hw = (c.maxX-c.minX)/2, hd = (c.maxZ-c.minZ)/2;
+      if (hw < 0.12 || hd < 0.12) continue;
+      const cx = (c.minX+c.maxX)/2, cz = (c.minZ+c.maxZ)/2;
+      csB.add(cx, cz, hw*0.98, hd*0.98, 0.62);
+      csB.add(cx, cz, hw+0.55, hd+0.55, 0.17);
+    }
+    for (const e of extraShadows) csB.add(e.x, e.z, e.hw, e.hd, e.s);
+    csB.build();
+  }
+
+  /* --- 收进自己的组，随即隐藏，并留下数据副本 --- */
+  const gB = new THREE.Group(); gB.name = 'level-2'; scene.add(gB);
+  for (const o of scene.children.slice())
+    if (o !== gB && !_lvMarkB.has(o)) gB.add(o);
+  gB.visible = false;
+  LEVELS.push({
+    key:'south-yard', map:'第 9 区', name:'南货柜堆场', hint:'敌方增援已就位',
+    spawn:{ x:0, z:25.5 },
+    colliders: colliders.slice(), worldSolid: worldSolid.slice(),
+    groundMesh: groundMesh.slice(), ceilMesh: ceilMesh.slice(),
+    mapRects: mapRects.slice(), extraShadows: extraShadows.slice(),
+    group:gB
+  });
+}
+
+/* ---- 加载完成时，活动关卡是第一关 ---- */
+_lvSwapArrays(LEVELS[0]);
 
 /* -------------------------------------------------------------------------
    空气中的浮尘。
@@ -3170,12 +3624,15 @@ const walkable = (() => {
       }
     }
   }
-  return (x, z) => {
+  function test(x, z){
     if (!ok) build();
     const i = cell(x), j = cell(z);
     if (i<0 || j<0 || i>=W || j>=W) return false;
     return !!ok[j*W+i];
-  };
+  }
+  /* 换关之后整张图的阻挡物都变了，泛洪填充的缓存必须作废 */
+  test.reset = ()=>{ ok = null; };
+  return test;
 })();
 
 /* 同 nearestFree，但结果还必须是玩家能走到的地方 */
@@ -4238,8 +4695,11 @@ function makeTag(name){
   return { sprite:spr, draw, tex:t };
 }
 
-/* 巡逻路线（路径点环路） */
-const ROUTES = [
+/* 巡逻路线（路径点环路）——每关一套。
+   这些坐标只是"设计意图"：加载时每一段都会被 nearestReachable / nearestFree
+   吸附到真正能站人的地方，所以不需要精确到厘米；但落在箱体内部会让吸附把
+   好几名敌人挤到同一个点上巡逻，所以仍然按空地的位置来写。 */
+const ROUTES_L1 = [
   [[16,-22],[16,-6],[16,8],[16,20],[16,4]],                 // 通道南北向
   [[-22,-10],[-18,0],[-22,3],[-26,-6]],                     // 二层（上层）
   [[-2,6],[5,-4],[0,-10],[-5,-2]],                          // 中央 / 车辆
@@ -4251,9 +4711,34 @@ const ROUTES = [
   [[-14,10],[-6,12],[-10,4],[-16,2]],                       // 西侧场院
   [[8,-14],[2,-6],[10,2],[14,-10]]                          // 游走位
 ];
-const UPPER_ROUTES = new Set([1,6]);
+const UPPER_L1 = new Set([1,6]);
+
+/* 第 9 区：十字主通道 + 四个装卸泊位。路线避开箱体，沿通道环路走。 */
+const ROUTES_L2 = [
+  [[  0,-20],[  0,-8],[  0, 6],[  0, 18]],                  // 中央纵向主通道
+  [[ 13,-12],[15.5,-2],[  6, 4],[  2,-6]],                  // 东北泊位 → 中心
+  [[-13,-12],[-15.5,-2],[ -6, 4],[ -2,-6]],                 // 西北泊位 → 中心
+  [[ 13, 12],[15.5, 2],[  6,-4],[  2, 6]],                  // 东南泊位 → 中心
+  [[-13, 12],[-15.5, 2],[ -6,-4],[ -2, 6]],                 // 西南泊位 → 中心
+  [[ 22,-6],[21.5,-2],[ 20, 6],[ 14, 2]],                   // 东侧场院
+  [[-22,-6],[-21.5,-2],[-20, 6],[-14, 2]],                  // 西侧场院
+  [[  6,-22],[ 14,-22],[ 19,-16],[12.8,-16]],               // 北带 + 东北泊位深处
+  [[ -6,-22],[-14,-22],[-19,-16],[-12.8,-16]],              // 北带 + 西北泊位深处
+  [[  4, 20],[ 10, 23],[ 16, 23],[  7, 16]]                 // 南侧开阔地
+];
+const UPPER_L2 = new Set();          // 第 9 区是平地，没有架空层
+
+/* 活动关卡用的路线：换场时由 applyLevel() 重新指向 */
+let ROUTES = ROUTES_L1;
+let UPPER_ROUTES = UPPER_L1;
+const LEVEL_ROUTES = [
+  { routes:ROUTES_L1, upper:UPPER_L1 },
+  { routes:ROUTES_L2, upper:UPPER_L2 }
+];
 
 const ST = { PATROL:0, ALERT:1, COMBAT:2, DEAD:3 };
+/* 每关的守军数量。两关沿用同一套设定，所以这是个常量而不是每关的字段。 */
+const KILLS_PER_LEVEL = 10;
 const enemies = [];
 let enemyHitMeshes = [];
 
@@ -4353,6 +4838,9 @@ const player = {
 const G = {
   running:false, over:false, paused:false, started:false,
   time:180, kills:0, headshots:0, shots:0, hits:0, elapsed:0,
+  killsTotal:0,            // 本次任务累计击杀（跨关）
+  level:0,                 // 当前关卡下标
+  trans:null,              // 关卡切换的时间轴状态，null 表示不在切换中
   dmgFlash:0, lowPulse:0, hbTimer:0, killFlash:0,
   grace:GRACE_TIME          // 敌对单位在你定神之前不开火
 };
@@ -4368,11 +4856,13 @@ const UI = {
   magNum:$('magNum'), resNum:$('resNum'), wname:$('wname'), wmode:$('wmode'),
   wicon:$('wicon'), reloadHint:$('reloadHint'),
   timer:$('timer'), killCount:$('killCount'), lowhp:$('lowhp'), edgeGlow:$('edgeGlow'),
+  mapMode:$('mapMode'),
   minimap:$('minimap'), mctx:$('minimap').getContext('2d'),
   slots:[...document.querySelectorAll('.slot')],
   cross:$('cross'), scope:$('scope'), retWrap:$('retWrap'), breathTag:$('breathTag'),
   comms:$('comms'),
   _scopeK:-1, _breathTip:null,
+  levelFade:$('levelFade'), endSub:$('endSub'),
   startScreen:$('startScreen'), endScreen:$('endScreen'), pause:$('pause'), boot:$('boot')
 };
 
@@ -4964,6 +5454,7 @@ function killEnemy(e, head, dir){
   e.tag.sprite.visible = false;
   rebuildHitMeshes();
   G.kills++;
+  G.killsTotal++;
   if (head) G.headshots++;
   killFeed(e.name, head);
   SFX.killChime();
@@ -4977,7 +5468,8 @@ function killEnemy(e, head, dir){
   alertSquad(30 + G.kills*7, 5,
              ex => pick([e.name+' 已阵亡——方位'+bearingWord(ex), '有人倒下，向我靠拢',
                          '失去 '+e.name+'，压上去']), 0.85);
-  if (G.kills>=10) endGame(true);
+  /* 本关清空：最后一关直接出任务报告，否则转场到下一关 */
+  if (G.kills >= KILLS_PER_LEVEL) levelCleared();
 }
 
 /* 手持模型的后坐冲量 */
@@ -6172,27 +6664,44 @@ function updateViewmodel(dt, mdx, mdy){
 /* =========================================================================
    19. 游戏流程
    ========================================================================= */
-function resetWorldState(){
-  for (const w of WEAPONS){ w.mag=w.magSize; w.res=w.reserve; w.spread=w.spreadBase; w.semi=false;
-                            w.vm.group.visible=false; }
+
+/* ---- 换关：把某一关的场地与它的数据副本设为活动状态 ----
+   只做显隐与数组替换，不重建任何几何体——两关在加载期就都建好了。 */
+function applyLevel(i){
+  G.level = i;
+  const L = LEVELS[i];
+  for (const lv of LEVELS) lv.group.visible = (lv === L);
+  _lvSwapArrays(L);
+  SPAWN.x = L.spawn.x; SPAWN.z = L.spawn.z;
+  ROUTES = LEVEL_ROUTES[i].routes;
+  UPPER_ROUTES = LEVEL_ROUTES[i].upper;
+  walkable.reset();                 // 阻挡物全变了，泛洪填充的缓存必须作废
+  UI.mapMode.textContent = L.map;
+}
+
+/* ---- 关卡内的复位：场地、敌人、计分、计时 ----
+   玩家的生命、护甲与弹药不在这里动。"换关"是接着打，不是重新部署；
+   要整条重来走 resetWorldState()。 */
+function resetLevelState(){
   player.pos.set(SPAWN.x,0,SPAWN.z); player.vel.set(0,0,0);
-  player.yaw=0; player.pitch=0; player.hp=100; player.armor=50;   // 面朝场院，而不是围栏
-  player.dead=false; player.weapon=0; player.switching=0; player.switchTo=-1;
-  player.reloadT=0; player.pumpT=0; player.boltT=0; player.fireCooldown=0; player.triggerHeld=false;
-  player.clickBuf=0; player.triggerReleased=true;
+  player.yaw=0; player.pitch=0;                 // 面朝场院，而不是围栏
+  player.dead=false; player.switching=0; player.switchTo=-1;
+  player.reloadT=0; player.pumpT=0; player.boltT=0; player.fireCooldown=0;
+  player.triggerHeld=false; player.clickBuf=0; player.triggerReleased=true;
   player.recoilPitch=player.recoilYaw=player.recoilVelP=player.recoilVelY=0;
   player.burstCount=0; player.burstIdle=0; player.fovKick=0;
-  player.shake=0; player.landShake=0; player.crouch=false; player.height=STAND_H; player.eye=STAND_H;
+  player.shake=0; player.landShake=0; player.crouch=false;
+  player.height=STAND_H; player.eye=STAND_H;
   player.ads=false; player.adsK=0; player.adsEase=0; player.swayAmp=1;
   player.breath=0; player.breathHeld=false; player.breathLock=false;
   player.mantleT=0; player.mantleTilt=0; player.jumpsLeft=1; player.spaceEdge=false;
-  sensScale=1; fovCur=BASE_FOV; vmRoot.visible=true;
-  vmCamera.position.z=0; vmCamera.fov=VM_FOV; vmCamera.updateProjectionMatrix();
-  UI._scopeK=-1; UI.scope.style.opacity=0; compMat.uniforms.scope.value=0; UI.cross.classList.remove('hidden');
-  crossSpread=0; crossFireT=0; crossShots=G.shots;   // 重新部署时准星已收拢
+  sensScale=1; fovCur=BASE_FOV;
+  UI._scopeK=-1; UI.scope.style.opacity=0; compMat.uniforms.scope.value=0;
+  UI.cross.classList.remove('hidden');
   UI.breathTag.classList.remove('on'); UI._breathTip=null;
-  WEAPONS[0].vm.group.visible=true;
+  crossSpread=0; crossFireT=0; crossShots=G.shots;   // 换关之后准星已收拢
 
+  /* 敌人：上一关的全部拆掉，按新场地的巡逻路线重新生成 */
   for (const e of enemies){
     scene.remove(e.obj);
     if (e.gunDropped) scene.remove(e.p.gun);   // 死亡时改挂父节点
@@ -6201,6 +6710,7 @@ function resetWorldState(){
   enemies.length = 0;
   spawnEnemies();
 
+  /* 贴花、弹壳、曳光与粒子都在世界坐标里，换一张图就没有意义了 */
   for (const d of DECALS) d.visible=false;
   for (const s of SHELLS){ s.life=0; s.mesh.visible=false; s.mesh.scale.setScalar(1); }
   for (const t of TRACERS) t.mesh.visible=false;
@@ -6210,14 +6720,31 @@ function resetWorldState(){
   }
   UI.feed.innerHTML='';
 
-  G.time=180; G.kills=0; G.headshots=0; G.shots=0; G.hits=0; G.elapsed=0;
+  /* 计时与命中率按关重置；累计击杀（G.killsTotal）跨关保留 */
+  G.time=180; G.kills=0; G.elapsed=0;
   G.over=false; G.dmgFlash=0; G.lowPulse=0; G.hbTimer=0; G.killFlash=0;
   G.grace=GRACE_TIME;
   _sweepAt=0; _noiseCd=0;
   UI.killCount.textContent='0';
   updateVitalsUI(); updateAmmoUI();
 }
+
+/* ---- 整局复位：武器、生命、全部计分，然后回到本关起点 ---- */
+function resetWorldState(){
+  for (const w of WEAPONS){ w.mag=w.magSize; w.res=w.reserve; w.spread=w.spreadBase; w.semi=false;
+                            w.vm.group.visible=false; }
+  player.hp=100; player.armor=50;
+  player.weapon=0;
+  vmRoot.visible=true;
+  vmCamera.position.z=0; vmCamera.fov=VM_FOV; vmCamera.updateProjectionMatrix();
+  WEAPONS[0].vm.group.visible=true;
+  G.headshots=0; G.shots=0; G.hits=0; G.killsTotal=0;
+  resetLevelState();
+}
 function startGame(){
+  G.trans = null;
+  UI.levelFade.classList.remove('on','show');
+  applyLevel(0);
   resetWorldState();
   UI.startScreen.classList.add('hide');
   UI.endScreen.classList.add('hide');
@@ -6225,13 +6752,71 @@ function startGame(){
   G.started=true; G.running=true; G.over=false;
   requestLock();
 }
+/* 失败后重新部署：从当前所在的那一关重新开始，而不是退回第一关 */
 function restart(){
   UI.endScreen.classList.add('hide');
-  startGame();
+  G.trans = null;
+  UI.levelFade.classList.remove('on','show');
+  applyLevel(G.level);
+  resetWorldState();
+  UI.hud.classList.add('on');
+  G.started=true; G.running=true; G.over=false;
+  requestLock();
 }
+
+/* ---- 关卡切换的时间轴 ----
+   全部在渲染循环里按 dt 推进，不用 setTimeout：页面被切到后台时定时器会被
+   节流，而切换状态一旦错位就会留下"画面全黑但游戏在跑"的破状态。
+   换场本身（重建十名敌人 + 重算寻路 + 翻新特效池）发生在黑场期间，
+   所以玩家看不到任何掉帧。 */
+const TRANS_FADE_IN  = 0.42;   // 到这一刻画面已全黑（CSS 过渡 0.34s），开始换场
+const TRANS_FADE_OUT = 1.50;   // 关卡标题在这里读够了，开始淡出
+const TRANS_END      = 2.00;   // 恢复操作
+
+function levelCleared(){
+  if (G.level < LEVELS.length-1) startLevelTransition(G.level+1);
+  else endGame(true);
+}
+function startLevelTransition(next){
+  if (G.trans) return;
+  G.trans = { t:0, next, swapped:false };
+  G.running = false;                 // 计时、AI、输入全部停住
+  G.over = false;
+  const L = LEVELS[next], n = UI.levelFade;
+  n.querySelector('.tag').textContent  = '关卡 ' + (next+1) + ' / ' + LEVELS.length;
+  n.querySelector('.nm').textContent   = L.name;
+  n.querySelector('.hint').textContent = L.hint;
+  n.classList.add('on');
+  SFX.radio();
+}
+function updateLevelTransition(dt){
+  const tr = G.trans;
+  if (!tr) return;
+  tr.t += dt;
+  /* 第一段：黑场 → 换场。只做一次。 */
+  if (!tr.swapped && tr.t >= TRANS_FADE_IN){
+    tr.swapped = true;
+    applyLevel(tr.next);
+    resetLevelState();
+    UI.levelFade.classList.add('show');
+    return;
+  }
+  if (!tr.swapped) return;
+  /* 第二段：淡出 → 交还操作 */
+  if (tr.t >= TRANS_FADE_OUT && UI.levelFade.classList.contains('on')){
+    UI.levelFade.classList.remove('on','show');
+  }
+  if (tr.t >= TRANS_END){
+    G.trans = null;
+    if (!G.paused && G.started && !G.over) G.running = true;
+  }
+}
+
 function endGame(win){
   if (G.over) return;
   G.over=true; G.running=false; G.started=false;
+  G.trans = null;
+  UI.levelFade.classList.remove('on','show');
   if (document.pointerLockElement) document.exitPointerLock();
   player.ads=false; player.adsK=0; player.adsEase=0;
   UI._scopeK=-1; UI.scope.style.opacity=0; compMat.uniforms.scope.value=0;
@@ -6244,9 +6829,11 @@ function endGame(win){
   const es = UI.endScreen;
   es.classList.remove('hide','win','lose');
   es.classList.add(win?'win':'lose');
-  $('endTitle').textContent = win ? '区域已肃清' : (player.dead?'阵亡':'时间耗尽');
+  $('endTitle').textContent = win ? '全区已肃清' : (player.dead?'阵亡':'时间耗尽');
   $('endTag').textContent = win ? '任务报告 // 成功' : '任务报告 // 失败';
-  $('sKills').innerHTML = G.kills + '<span>/10</span>';
+  UI.endSub.textContent = LEVELS[G.level].map + ' —— ' + LEVELS[G.level].name;
+  /* 击杀数按整局统计：两处场院各 10 名 */
+  $('sKills').innerHTML = G.killsTotal + '<span>/' + (KILLS_PER_LEVEL*LEVELS.length) + '</span>';
   $('sHeads').textContent = G.headshots;
   const acc = G.shots>0 ? Math.round(G.hits/G.shots*100) : 0;
   $('sAcc').innerHTML = acc + '<span>%</span>';
@@ -6310,6 +6897,9 @@ function frame(now){
   adaptive(dt);
 
   const mdx = mouseDX, mdy = mouseDY;
+
+  /* 换关过场优先于一切：它自己按 dt 推进，期间游戏逻辑保持冻结 */
+  if (G.trans) updateLevelTransition(dt);
 
   if (G.running && !G.over){
     G.elapsed += dt;
